@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .version-marker {
+            position: fixed;
+            top: 0;
+            right: 0;
+            padding: 0.5rem;
+            background-color: #2c3e50;
+            color: white;
+            font-size: 0.8rem;
+            border-bottom-left-radius: 8px;
+        }
+
+        input[type='radio'] {
+            accent-color: rgb(185 28 28);
+        }
+    </style>
+    <title>RIS Score Calculator - Relative Index for Streetlifting</title>
+</head>
+<body class="bg-black text-white p-8 min-h-screen flex flex-col items-center justify-center relative">
+
+<div class="version-marker">Version Beta-Marineford (Released: Feb 3, 2024)</div>
+
+<div class="bg-gray-900 p-8 rounded-md shadow-md max-w-md w-full">
+
+    <h1 class="text-4xl font-bold mb-2 text-center"><span class="text-red-700">RIS</span> Score Calculator</h1>
+    <h2 class="text-2xl text-gray-200 text-center mb-6 font-medium"><span class="text-red-700">R</span>elative <span class="text-red-700">I</span>ndex for <span class="text-red-700">S</span>treetlifting</h2>
+
+    <div class="mb-4">
+        <label for="totalWeight" class="block text-lg font-medium">Total (kg)</label>
+        <input type="number" id="totalWeight" class="mt-1 p-2 w-full border rounded focus:outline-none focus:ring focus:border-red-700 text-black" value="0"/>
+    </div>
+
+    <div class="mb-4">
+        <label for="bodyWeight" class="block text-lg font-medium">Body Weight (kg)</label>
+        <input type="number" id="bodyWeight" class="mt-1 p-2 w-full border rounded focus:outline-none focus:ring focus:border-red-700 text-black" value="0"/>
+    </div>
+
+    <div class="mb-4">
+        <label class="block text-lg font-medium">Gender</label>
+        <div class="flex justify-evenly text-md">
+            <label class="mr-4">
+                <input type="radio" name="gender" value="men" class="mr-2" checked="checked">
+                ♂ Men
+            </label>
+            <label>
+                <input type="radio" name="gender" value="women" class="mr-2">
+                ♀ Women
+            </label>
+        </div>
+    </div>
+
+    <button onclick="calculateRisScore()" class="bg-red-700 text-white px-4 py-2 rounded hover:bg-red-800 w-full mb-4">Calculate</button>
+
+    <div class="text-center">
+        <p class="text-7xl font-semibold text-red-700" id="risScoreResult">0.00</p>
+
+    </div>
+
+    <div class="mt-6 text-gray-100 text-center">
+        <p>
+            Similar to score-scaling systems in other strength sports like the Wilks and IPF GL in Powerlifting, and SINCLAIR in Weightlifting, the RIS Score is designed to answer crucial questions in Streetlifting:
+        <ul class="list-disc italic">
+                <li>What is the relative strength of a streetlifting athlete?</li>
+                <li>How can you compare two athletes regardless of gender and body weight?</li>
+            </ul>
+        </p>
+        <br>
+        <p>Our calculator employs a scientific methodology grounded in statistical analysis. While the formula might be a bit tricky, fret not! This calculator provides a user-friendly interface for effortless RIS Score computation. Keep in mind that the score is crafted to be updated annually, ensuring relevance in the dynamic world of streetlifting.</p>
+    </div>
+
+    <div class="mt-6 text-center text-red-700 hover:underline">
+        <a href="https://drive.google.com/file/d/10nLmVI9sYEHEsr9SznvFuj8LYYw_dbLT/view?usp=sharing">Explanation of the scientific methodology.</a>
+    </div>
+
+    <div class="mt-6 flex justify-center text-2xl text-white">
+        <a href="contact@warisradji.com" class="mx-4 hover:text-red-700" title="Email">
+            <i class="fas fa-envelope"></i>
+        </a>
+        <a href="https://www.instagram.com/riiswa/" class="mx-4 hover:text-red-700" title="Instagram">
+            <i class="fab fa-instagram"></i>
+        </a>
+    </div>
+
+</div>
+
+<script>
+    const men_const = [324.5, 536.7992741244116, 0.10695917941591168, 46.488407546013995, 10.562013527211013];
+    const women_const = [185.83333333333334, 250.84068778401235, 0.05438651851738567, 29.10832262314385, 1.6646016306185296];
+
+    function risIndex(x, A, K, B, v, Q) {
+        return 100 / (A + (K - A) / (1 + Q * Math.exp(-B * (x - v))));
+    }
+
+    function calculateRisScore() {
+        const totalWeight = document.getElementById('totalWeight').value;
+        const bodyWeight = document.getElementById('bodyWeight').value;
+        const gender = document.querySelector('input[name="gender"]:checked');
+
+        if (totalWeight <= 0 || bodyWeight <= 0) {
+            alert("Please enter values greater than 0 for Total and Body Weight.");
+            return;
+        }
+
+        const genderValue = gender.value;
+
+        // You can replace this formula with your actual RIS score calculation
+        const risScore = risIndex(bodyWeight, ...(genderValue === "men" ? men_const : women_const)) * totalWeight;
+
+        document.getElementById('risScoreResult').innerText = `${risScore.toFixed(2)}`;
+    }
+</script>
+
+</body>
+</html>
