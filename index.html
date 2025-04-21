@@ -1,128 +1,1113 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RIS - Relative Index for Streetlifting | 2025 Edition Official Calculator</title>
+    <meta name="description" content="Calculate your Relative Index for Streetlifting (RIS) score. The official 2025 calculator for fair comparison between athletes of different weights.">
+    <meta name="keywords" content="RIS, Relative Index for Streetlifting, streetlifting, strength calculator, bodyweight ratio, strength comparison, RIS calculator">
+    <meta name="author" content="Waris Radji & Mathieu Ardoin">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="RIS - Relative Index for Streetlifting | 2025 Edition">
+    <meta property="og:description" content="Calculate your Relative Index for Streetlifting (RIS) score. The official 2025 calculator for fair comparison between athletes of different weights.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://warisradji.com/ris">
+
+    <!-- External Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <script src="https://cdn.plot.ly/plotly-3.0.0.min.js" charset="utf-8"></script>
+    <script src="static/ris.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/excel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            100: '#0F0F0F',
+                            200: '#1A1A1A',
+                            300: '#2A2A2A',
+                            400: '#3A3A3A',
+                        },
+                        accent: {
+                            100: '#6366F1',
+                            200: '#4F46E5',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap" rel="stylesheet">
+
+    <!-- Custom Styles -->
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
+        body { font-family: 'Roboto Flex', sans-serif; }
+        h1, h2, h3 { font-family: 'DM Serif Display', serif; }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1A1A1A;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3A3A3A;
+            border-radius: 6px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4A4A4A;
         }
 
-        .version-marker {
-            position: fixed;
-            top: 0;
-            right: 0;
-            padding: 0.5rem;
-            background-color: #2c3e50;
-            color: white;
-            font-size: 0.8rem;
-            border-bottom-left-radius: 8px;
+        /* Plot container styling */
+        .plot-container {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        input[type='radio'] {
-            accent-color: rgb(185 28 28);
+        /* Custom tooltip styling */
+        .js-plotly-plot .plotly .hoverlayer .hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        /* Code blocks styling */
+        .hljs {
+            background: #1A1A1A !important;
+            border-radius: 4px;
+            padding: 1rem !important;
+            font-size: 0.8rem !important;
+        }
+
+        .code-block-wrapper {
+            position: relative;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #3A3A3A;
+            border: none;
+            border-radius: 4px;
+            color: #e2e8f0;
+            padding: 2px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .code-block-wrapper:hover .copy-button {
+            opacity: 1;
+        }
+
+        .copy-button:hover {
+            background: #4F46E5;
+        }
+
+        a {
+            text-decoration: underline!important;
+            transition: color 0.2s ease;
+        }
+        a:hover {
+            color: indianred;
+        }
+
+        /* Button hover effects */
+        .btn-primary {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s ease;
+        }
+        .btn-primary:active::after {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* Enhanced input focus states */
+        input:focus, button:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.5);
+        }
+
+        /* Remove focus state for FAQ toggles */
+        .faq-toggle:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        /* Loading state for buttons */
+        .loading-spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #DC2626;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Smooth transitions for all interactive elements */
+        button, input, label, .faq-icon, .nav-link {
+            transition: all 0.2s ease;
+        }
+
+        /* Add subtle parallax effect to background sections */
+        .parallax-section {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        /* Number animation */
+        .number-animation {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Enhanced image hover effects */
+        .logo-container img {
+            transition: all 0.3s ease;
+        }
+        .logo-container:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Skeleton loader for plots */
+        .skeleton-loader {
+            background: linear-gradient(90deg, #2A2A2A 25%, #3A3A3A 50%, #2A2A2A 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+        }
+
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
     </style>
-    <title>RIS Score Calculator - Relative Index for Streetlifting</title>
 </head>
-<body class="bg-black text-white p-8 min-h-screen flex flex-col items-center justify-center relative">
-
-<div class="version-marker">Version 0.1 (Released: December 6, 2023)</div>
-
-<div class="bg-gray-900 p-8 rounded-md shadow-md max-w-md w-full">
-
-    <h1 class="text-4xl font-bold mb-2 text-center"><span class="text-red-700">RIS</span> Score Calculator</h1>
-    <h2 class="text-2xl text-gray-200 text-center mb-6 font-medium"><span class="text-red-700">R</span>elative <span class="text-red-700">I</span>ndex for <span class="text-red-700">S</span>treetlifting</h2>
-
-    <div class="mb-4">
-        <label for="totalWeight" class="block text-lg font-medium">Total (kg)</label>
-        <input type="number" id="totalWeight" class="mt-1 p-2 w-full border rounded focus:outline-none focus:ring focus:border-red-700 text-black" value="0"/>
-    </div>
-
-    <div class="mb-4">
-        <label for="bodyWeight" class="block text-lg font-medium">Body Weight (kg)</label>
-        <input type="number" id="bodyWeight" class="mt-1 p-2 w-full border rounded focus:outline-none focus:ring focus:border-red-700 text-black" value="0"/>
-    </div>
-
-    <div class="mb-4">
-        <label class="block text-lg font-medium">Gender</label>
-        <div class="flex justify-evenly text-md">
-            <label class="mr-4">
-                <input type="radio" name="gender" value="men" class="mr-2" checked="checked">
-                ♂ Men
-            </label>
-            <label>
-                <input type="radio" name="gender" value="women" class="mr-2">
-                ♀ Women
-            </label>
+<body class="bg-dark-100 text-gray-200 min-h-screen leading-relaxed">
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-dark-100 flex items-center justify-center z-50 transition-opacity duration-500">
+        <div class="text-center">
+            <div class="loading-spinner w-12 h-12 border-4"></div>
+            <p class="mt-4 text-gray-400">Loading RIS Calculator...</p>
         </div>
     </div>
 
-    <button onclick="calculateRisScore()" class="bg-red-700 text-white px-4 py-2 rounded hover:bg-red-800 w-full mb-4">Calculate</button>
+    <main class="container mx-auto px-6 py-4 max-w-9xl opacity-0 transition-opacity duration-500" id="main-content">
+        <!-- Header -->
+        <header class="mb-5 mx-2 md:mx-14 animate-fade-in">
+            <h2 class="text-2xl md:text-3xl font-semibold text-white text-pretty">
+                <span class="text-red-600">R</span>elative <span class="text-red-600">I</span>ndex for <span class="text-red-600">S</span>treetlifting - 2025 Edition
+            </h2>
+            <p class="text-xs italic">
+                Created by
+                <a href="https://www.instagram.com/riiswa" target="_blank">Waris Radji</a>
+                &
+                <a href="https://www.instagram.com/mat95.sw" target="_blank">Mathieu Ardoin</a>.
+            </p>
+        </header>
 
-    <div class="text-center">
-        <p class="text-7xl font-semibold text-red-700" id="risScoreResult">0.00</p>
+        <!-- Introduction -->
+        <div class="p-5 md:mx-14 animate-slide-up" style="animation-delay: 0.2s">
+            <p class="text-gray-200 text-base md:text-lg text-center text-pretty">
+                The <span class="text-red-600 font-semibold">R</span>elative <span class="text-red-600 font-semibold">I</span>ndex for <span class="text-red-600 font-semibold">S</span>treetlifting (<span class="text-red-600 font-semibold">RIS</span>) provides the definitive method for comparing Streetlifting athletes across weight classes within the same gender. Developed specifically for All-4 competitions, this scoring system normalizes strength performance using comprehensive data from elite competitors. Updated annually to reflect evolving standards, <span class="text-red-600 font-semibold">RIS</span> offers a fair benchmark for athletes, coaches, and competition organizers worldwide.
+            </p>
+        </div>
 
-    </div>
+        <!-- RIS Calculator Section -->
+        <div class="px-5 rounded-lg max-w-2xl mx-auto animate-slide-up bg-dark-200/30 backdrop-blur-sm p-6 border border-dark-300/50 shadow-lg" style="animation-delay: 0.4s">
+            <div class="flex flex-col space-y-6">
+                <!-- Total input -->
+                <div class="relative group">
+                    <div class="absolute inset-0 bg-gradient-to-r from-red-600/20 to-accent-100/10 rounded-lg opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-300 -z-10 blur-sm"></div>
+                    <label for="total-input" class="block mb-2 text-white font-medium text-sm transition-all group-focus-within:text-red-500">Total (kg)</label>
+                    <div class="relative">
+                        <input type="number" id="total-input" class="w-full bg-dark-100/80 border border-dark-300 text-white p-4 rounded-lg focus:ring-2 focus:ring-red-600/50 focus:border-red-600 focus:outline-none transition-all placeholder-gray-500" placeholder="Enter your total" min="0">
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 opacity-0 transition-opacity pointer-events-none peer-focus:opacity-100 peer-valid:opacity-100">kg</span>
+                    </div>
+                </div>
 
-    <div class="mt-6 text-gray-100 text-center">
-        <p>
-            Similar to score-scaling systems in other strength sports like the Wilks and IPF GL in Powerlifting, and SINCLAIR in Weightlifting, the RIS Score is designed to answer crucial questions in Streetlifting:
-        <ul class="list-disc italic">
-                <li>What is the relative strength of a streetlifting athlete?</li>
-                <li>How can you compare two athletes regardless of gender and body weight?</li>
-            </ul>
-        </p>
-        <br>
-        <p>Our calculator employs a scientific methodology grounded in statistical analysis. While the formula might be a bit tricky, fret not! This calculator provides a user-friendly interface for effortless RIS Score computation. Keep in mind that the score is crafted to be updated annually, ensuring relevance in the dynamic world of streetlifting.</p>
-    </div>
+                <!-- Bodyweight input -->
+                <div class="relative group">
+                    <div class="absolute inset-0 bg-gradient-to-r from-red-600/20 to-accent-100/10 rounded-lg opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-300 -z-10 blur-sm"></div>
+                    <label for="bodyweight-input" class="block mb-2 text-white font-medium text-sm transition-all group-focus-within:text-red-500">Body Weight (kg)</label>
+                    <div class="relative">
+                        <input type="number" id="bodyweight-input" class="w-full bg-dark-100/80 border border-dark-300 text-white p-4 rounded-lg focus:ring-2 focus:ring-red-600/50 focus:border-red-600 focus:outline-none transition-all placeholder-gray-500" placeholder="Enter your body weight" min="0">
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 opacity-0 transition-opacity pointer-events-none peer-focus:opacity-100 peer-valid:opacity-100">kg</span>
+                    </div>
+                </div>
 
-    <div class="mt-6 text-center text-red-700 hover:underline">
-        <a href="https://drive.google.com/file/d/10nLmVI9sYEHEsr9SznvFuj8LYYw_dbLT/view?usp=sharing">Explanation of the scientific methodology.</a>
-    </div>
+                <!-- Gender selection -->
+                <div class="relative group">
+                    <div class="absolute inset-0 bg-gradient-to-r from-red-600/20 to-accent-100/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-sm"></div>
+                    <label class="block mb-2 text-white font-medium text-sm">Gender</label>
+                    <div class="grid grid-cols-2 gap-4 mt-1">
+                        <label class="relative flex items-center justify-center cursor-pointer group/radio bg-dark-100/80 border border-dark-300 p-4 rounded-lg transition-all hover:border-red-600/50">
+                            <input type="radio" name="gender" value="male" class="hidden peer" checked>
+                            <span class="w-4 h-4 border rounded-full border-red-600 inline-block mr-3 peer-checked:bg-red-600 peer-checked:ring-2 peer-checked:ring-red-600/30 transition-all"></span>
+                            <span class="text-white group-hover/radio:text-red-500 transition-colors font-medium">♂ Men</span>
+                            <span class="absolute inset-0 bg-red-600/10 rounded-lg opacity-0 peer-checked:opacity-100 transition-opacity"></span>
+                        </label>
+                        <label class="relative flex items-center justify-center cursor-pointer group/radio bg-dark-100/80 border border-dark-300 p-4 rounded-lg transition-all hover:border-red-600/50">
+                            <input type="radio" name="gender" value="female" class="hidden peer">
+                            <span class="w-4 h-4 border rounded-full border-white inline-block mr-3 peer-checked:bg-white peer-checked:ring-2 peer-checked:ring-white/30 transition-all"></span>
+                            <span class="text-white group-hover/radio:text-red-500 transition-colors font-medium">♀ Women</span>
+                            <span class="absolute inset-0 bg-white/5 rounded-lg opacity-0 peer-checked:opacity-100 transition-opacity"></span>
+                        </label>
+                    </div>
+                </div>
 
-    <div class="mt-6 flex justify-center text-2xl text-white">
-        <a href="contact@warisradji.com" class="mx-4 hover:text-red-700" title="Email">
-            <i class="fas fa-envelope"></i>
-        </a>
-        <a href="https://www.instagram.com/riiswa/" class="mx-4 hover:text-red-700" title="Instagram">
-            <i class="fab fa-instagram"></i>
-        </a>
-    </div>
+                <!-- Calculate button -->
+                <button id="calculate-btn" class="btn-primary relative overflow-hidden bg-gradient-to-r from-red-700 to-red-600 hover:from-red-800 hover:to-red-700 active:from-red-900 active:to-red-800 text-white py-4 rounded-lg text-center font-medium transition-all w-full transform hover:scale-[1.02] active:scale-[0.98] shadow-md">
+                    <span class="relative z-10">Calculate RIS Score</span>
+                </button>
 
-</div>
+                <!-- Result -->
+                <div class="flex flex-col justify-center items-center mt-4">
+                    <div class="text-center mb-2">
+                        <span class="text-sm text-gray-400">Your RIS Score</span>
+                    </div>
+                    <div id="ris-result" class="text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-accent-100 number-animation">0.00</div>
 
-<script>
-    const men_const = [308.5, 536.363293273545, 0.1013742998889087, 60.39746396108519, 2.2100554021356436];
-    const women_const = [180.83333333333334, 241.74894812447127, 0.24737447093352963, 50.192523991912516, 1.3834293214001367];
+                    <div class="w-full justify-between mt-5 relative">
+                        <div class="text-xs text-gray-400 absolute hidden sm:block" style="left: 0; bottom: 0">Ever tried SL? 🤷</div>
+                        <div class="text-xs text-gray-400 absolute" style="right: 54%; bottom: 0">Beginner 🐣‍</div>
+                        <div class="text-xs text-gray-400 absolute" style="right: 19%; bottom: 0">Advanced 🚀‍</div>
+                    </div>
 
-    function risIndex(x, A, K, B, v, Q) {
-        return 100 / (A + (K - A) / (1 + Q * Math.exp(-B * (x - v))));
-    }
+                    <!-- Rating indicator (shows up when there's a result) -->
+                    <div class="w-full mt-1 h-2 bg-dark-300 rounded-full overflow-hidden relative">
+                        <!-- Level markers -->
+                        <div class="absolute top-0 bottom-0 left-[30%] w-px bg-white/30"></div>
+                        <div class="absolute top-0 bottom-0 left-[45%] w-px bg-white/30"></div>
+                        <div class="absolute top-0 bottom-0 left-[70%] w-px bg-white/30"></div>
+                        <div class="absolute top-0 bottom-0 left-[80%] w-px bg-white/30"></div>
+                        <div class="absolute top-0 bottom-0 left-[95%] w-px bg-white/30"></div>
 
-    function calculateRisScore() {
-        const totalWeight = document.getElementById('totalWeight').value;
-        const bodyWeight = document.getElementById('bodyWeight').value;
-        const gender = document.querySelector('input[name="gender"]:checked');
+                        <div id="rating-indicator" class="h-full bg-gradient-to-r from-red-600 to-accent-100 w-0 transition-all duration-500 opacity-80"></div>
+                    </div>
 
-        if (totalWeight <= 0 || bodyWeight <= 0) {
-            alert("Please enter values greater than 0 for Total and Body Weight.");
-            return;
+                    <div class="w-full justify-between mt-1 relative">
+                        <div class="text-xs text-gray-400 absolute sm:hidden" style="left: 0;">Ever tried SL? 🤷</div>
+                        <div class="text-xs text-gray-400 absolute hidden sm:block" style="right: 69%">It's complicated 😮‍💨</div>
+                        <div class="text-xs text-gray-400 absolute" style="right:29%;">Intermediate 📈</div>
+                        <div class="text-xs text-gray-400 absolute" style="right:0;">World-class 🏆</div>
+                    </div>
+
+                    <!-- See Rank button - hidden by default -->
+                    <div id="rank-buttons" class="mt-6 hidden opacity-0 transition-opacity duration-300 w-full">
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <button id="show-on-curve-btn" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg text-center font-medium transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-md">
+                                <span class="flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    </svg>
+                                    Show on Performance Curve
+                                </span>
+                            </button>
+                            <button id="clear-curve-btn" class="flex-1 bg-dark-300 hover:bg-dark-400 text-white py-3 px-4 rounded-lg text-center font-medium transition-all hidden transform hover:scale-[1.02] active:scale-[0.98] shadow-md">
+                                <span class="flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                    Clear
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Data Analysis Section -->
+        <div class="p-5 md:mx-14 mt-8 animate-fade-in" style="animation-delay: 0.6s">
+            <h3 class="text-xl font-semibold mb-2 text-white" id="visualization">A data-driven approach</h3>
+            <p class="text-gray-200 text-sm md:text-base text-justify">
+                The <span class="text-red-600 font-semibold">RIS</span> scoring system is built on comprehensive data analysis of elite competition results. Data was collected from the <a href="https://www.allthingsstreetlifting.com/">All Things: Streetlifting</a> database, specifically examining the top 10 performers in each weight class who competed before 2025 in the All-4 competition format. Both bodyweight and total performance figures were analyzed using robust regression analysis—a statistical technique that identifies the relationship between these variables by finding the curve that best fits the data points, while taking in account outliers. In simple terms, this process revealed how lifting performance typically scales with bodyweight among top athletes, creating a function that expresses expected total performance based on bodyweight. This function was then normalized to create the <span class="text-red-600 font-semibold">RIS</span> Score. <i>A research paper that describe the scientific methodology will be released soon.</i>
+            </p>
+        </div>
+
+        <!-- Data Visualization -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mt-8">
+            <div id="men-plot-container" class="w-full h-[500px] rounded-lg overflow-hidden animate-fade-in relative" style="animation-delay: 0.8s">
+                <div class="skeleton-loader absolute inset-0 rounded-lg"></div>
+                <div id="men-plot" class="w-full h-full"></div>
+            </div>
+            <div id="women-plot-container" class="w-full h-[500px] rounded-lg overflow-hidden animate-fade-in relative" style="animation-delay: 1s">
+                <div class="skeleton-loader absolute inset-0 rounded-lg"></div>
+                <div id="women-plot" class="w-full h-full"></div>
+            </div>
+        </div>
+
+        <div class="p-5 md:mx-14">
+            <p class="text-gray-400 text-xs md:text-sm text-justify">
+                This visualization shows the relationship between body weight (x-axis) and total performance score (y-axis)
+                for athletes across different weight classes. The size of each point represents the total score, with larger
+                points indicating higher scores. Hover over points to see detailed athlete information.
+            </p>
+        </div>
+
+        <!-- Integration Section -->
+        <div class="p-5 md:mx-14 mt-8">
+            <h3 class="text-xl font-semibold mb-4 text-white" id="integration">Integration</h3>
+            <p class="text-gray-200 text-sm md:text-base mb-4 text-justify">
+                The <span class="text-red-600 font-semibold">RIS</span> formula is available for free integration into any platform or application. You are welcome to use this scoring system without prior request for competitions, websites, apps, or analysis tools. We simply ask that you credit the creators of the <span class="text-red-600 font-semibold">RIS</span> system in your implementation.
+            </p>
+
+            <div class="mb-6 overflow-hidden animate-fade-in">
+                <table id="constants-table" class="w-full text-left border-collapse">
+                    <thead>
+                        <tr>
+                            <th class="text-white py-2 border-b border-dark-300">Constants (2025)</th>
+                            <th class="text-white py-2 border-b border-dark-300">Men</th>
+                            <th class="text-white py-2 border-b border-dark-300">Women</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Table rows will be populated via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mb-6">
+                <p class="text-gray-200 text-sm md:text-base mb-4">
+                    The formula is:
+                </p>
+                <div class="animate-fade-in">
+                    \[
+                    \text{RIS} = \text{Total} \times \frac{100}{A + \frac{K - A}{1 + Q \cdot e^{-B \cdot (\text{BW} - v)}}}
+                    \]
+                </div>
+                <p class="text-gray-400 text-xs mt-2">
+                    where BW is body weight in kg, Total is the athlete's total lifted weight in kg, and A, K, B, v, Q are the gender-specific constants defined above.
+                </p>
+            </div>
+
+            <div class="mb-6">
+                <h4 class="text-lg font-medium mb-2 text-white">Microsoft Excel</h4>
+                <p class="text-gray-200 text-sm md:text-base mb-2 text-justify">Copy these formulas directly into Excel to calculate <span class="text-red-600 font-semibold">RIS</span> scores. The formula references cells A2 for body weight and B2 for total weight, but you can adjust these cell references as needed.</p>
+                <p class="text-white mb-1">For Men:</p>
+                <div class="mb-3 code-block-wrapper transition-transform duration-200 hover:scale-[1.01]">
+                    <pre><code id="excel-men-formula" class="excel"></code></pre>
+                    <button class="copy-button" data-target="excel-men-formula">Copy</button>
+                </div>
+                <p class="text-white mb-1">For Women:</p>
+                <div class="code-block-wrapper transition-transform duration-200 hover:scale-[1.01]">
+                    <pre><code id="excel-women-formula" class="excel"></code></pre>
+                    <button class="copy-button" data-target="excel-women-formula">Copy</button>
+                </div>
+                <p class="text-gray-400 text-xs mt-2">
+                    Assuming A2 = Body Weight in kg, B2 = Total in kg
+                </p>
+            </div>
+
+            <div>
+                <h4 class="text-lg font-medium mb-2 text-white">Google Sheets</h4>
+                <p class="text-gray-200 mb-2 text-sm md:text-base text-justify">For a more convenient implementation in Google Sheets, you can create custom functions that calculate <span class="text-red-600 font-semibold">RIS</span> scores with a single function call:</p>
+                <ol class="text-sm md:text-base text-gray-300 list-decimal pl-4 space-y-1 mb-2">
+                    <li>Open your Google Sheet</li>
+                    <li>Go to Extensions → Apps Script</li>
+                    <li>Paste the following code:</li>
+                </ol>
+                <div class="code-block-wrapper transition-transform duration-200 hover:scale-[1.01]">
+                    <pre><code id="google-sheets-code" class="javascript"></code></pre>
+                    <button class="copy-button" data-target="google-sheets-code">Copy</button>
+                </div>
+                <p class="text-sm md:text-base text-gray-300 mt-2">After saving the script, you can use the functions directly in your sheet:</p>
+                <ul class="text-sm md:text-base text-gray-300 list-disc pl-4 space-y-1 mt-1">
+                    <li><code>=RIS_MEN(A2;B2)</code> - where A2 is body weight and B2 is total weight for male athletes</li>
+                    <li><code>=RIS_WOMEN(A2;B2)</code> - where A2 is body weight and B2 is total weight for female athletes</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="p-5 md:mx-14 mt-8">
+            <h3 class="text-xl font-semibold mb-4 text-white" id="faq">Frequently Asked Questions</h3>
+
+            <div class="space-y-4">
+                <!-- FAQ Item 1 -->
+                <div class="border-b border-dark-300 pb-4">
+                    <button class="faq-toggle flex w-full justify-between items-center text-left focus:outline-none group">
+                        <span class="text-white font-medium group-hover:text-red-500 transition-colors">What's new in the 2025 Edition of <span class="text-red-600 font-semibold">RIS</span>?</span>
+                        <svg class="faq-icon w-5 h-5 text-gray-400 transform transition-transform group-hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="faq-content hidden mt-2 text-gray-300 text-sm md:text-base text-justify">
+                        <p>The 2025 Edition of the <span class="text-red-600 font-semibold">RIS</span> includes several important updates while maintaining the core methodology:</p>
+                        <ul class="list-disc pl-5 mt-2 space-y-1">
+                            <li>Integration of all competition data from 2024, providing a more current reflection of performance standards</li>
+                            <li>Inclusion of the new women's -52kg weight category, improving accuracy for lightweight female athletes</li>
+                            <li>Implementation of a more robust statistical method that better handles outliers in the data</li>
+                        </ul>
+                        <p class="mt-2">The fundamental approach remains unchanged, ensuring continuity with previous editions while offering improved accuracy based on the most recent competitive data.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 2 -->
+                <div class="border-b border-dark-300 pb-4">
+                    <button class="faq-toggle flex w-full justify-between items-center text-left focus:outline-none group">
+                        <span class="text-white font-medium group-hover:text-red-500 transition-colors">Can I compare men's and women's scores with <span class="text-red-600 font-semibold">RIS</span>?</span>
+                        <svg class="faq-icon w-5 h-5 text-gray-400 transform transition-transform group-hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="faq-content hidden mt-2 text-gray-300 text-sm md:text-base text-justify">
+                        <p>Currently, the <span class="text-red-600 font-semibold">RIS</span> system is designed to compare athletes within the same gender category. Due to significant differences in strength-to-weight ratio distributions between men and women and limited cross-gender competitive data, making accurate comparisons across genders is challenging with the current model. Each gender has its own set of reference data and constants used in the <span class="text-red-600 font-semibold">RIS</span> formula to ensure fair and meaningful comparisons within the same gender group.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 3 -->
+                <div class="border-b border-dark-300 pb-4">
+                    <button class="faq-toggle flex w-full justify-between items-center text-left focus:outline-none group">
+                        <span class="text-white font-medium group-hover:text-red-500 transition-colors">How often are the <span class="text-red-600 font-semibold">RIS</span> constants updated?</span>
+                        <svg class="faq-icon w-5 h-5 text-gray-400 transform transition-transform group-hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="faq-content hidden mt-2 text-gray-300 text-sm md:text-base text-justify">
+                        <p>The <span class="text-red-600 font-semibold">RIS</span> constants are updated annually to incorporate the latest competition data. This ensures that the scoring system remains current with the evolving standards of performance in streetlifting. Each annual update is labeled with its year (e.g., "RIS 2025 Edition") to help users identify which version they're working with.  The <a href="http://127.0.0.1:4000/warisradji/ris/2024.html">2024 version</a> of the score can be found on our archives.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 4 -->
+                <div class="border-b border-dark-300 pb-4">
+                    <button class="faq-toggle flex w-full justify-between items-center text-left focus:outline-none group">
+                        <span class="text-white font-medium group-hover:text-red-500 transition-colors">What is considered a "good" <span class="text-red-600 font-semibold">RIS</span> score?</span>
+                        <svg class="faq-icon w-5 h-5 text-gray-400 transform transition-transform group-hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="faq-content hidden mt-2 text-gray-300 text-sm md:text-base text-justify">
+                        <p><span class="text-red-600 font-semibold">RIS</span> scores typically fall within these ranges:</p>
+                        <ul class="list-disc pl-5 mt-2 space-y-1">
+                            <li><strong>Below 70:</strong> Beginner level</li>
+                            <li><strong>70-80:</strong> Intermediate level</li>
+                            <li><strong>80-95:</strong> Advanced level</li>
+                            <li><strong>Above 95:</strong> World-class level</li>
+                        </ul>
+                        <p class="mt-2">A score of 100 would indicate performance equivalent to the statistical average of top athletes in your weight class.</p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 5 -->
+                <div class="border-b border-dark-300 pb-4">
+                    <button class="faq-toggle flex w-full justify-between items-center text-left focus:outline-none group">
+                        <span class="text-white font-medium group-hover:text-red-500 transition-colors">Can I use the <span class="text-red-600 font-semibold">RIS</span> calculator for other strength sports?</span>
+                        <svg class="faq-icon w-5 h-5 text-gray-400 transform transition-transform group-hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="faq-content hidden mt-2 text-gray-300 text-sm md:text-base text-justify">
+                        <p>The <span class="text-red-600 font-semibold">RIS</span> was specifically developed for streetlifting using data from All-4 competitions. While the mathematical model could theoretically be applied to other strength sports, the constants would need to be recalculated using sport-specific data. Using the current <span class="text-red-600 font-semibold">RIS</span> constants for other strength sports would not provide accurate comparisons.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Organization Supporters Section -->
+        <div class="p-5 md:mx-14 mt-8 rounded-md">
+            <h3 class="text-xl font-semibold mb-6 text-white text-center">Special Thanks</h3>
+            <p class="text-center mb-6 text-sm md:text-base text-pretty">
+                We extend our gratitude to the organizations that have made this research and calculator possible through their support and collaboration.
+            </p>
+            <div class="flex justify-center items-center space-x-12">
+                <div class="h-20 flex items-center justify-evenly logo-container brightness-0 invert">
+                    <a href="https://www.instagram.com/fnsl__/" target="_blank">
+                        <img src="static/img/fnsl.png" alt="FNSL Logo" class="h-14 w-auto object-contain transition-all duration-300">
+                    </a>
+                </div>
+                <div class="h-20 flex items-center justify-center logo-container">
+                    <a href="https://www.allthingsstreetlifting.com/" target="_blank">
+                        <img src="static/img/atsl.png" alt="All Things: Streetlifting Logo" class="h-20 w-auto object-contain transition-all duration-300">
+                    </a>
+                </div>
+                <div class="h-20 flex items-center justify-center logo-container">
+                    <a href="https://final-rep.com/" target="_blank">
+                        <img src="static/img/final-rep.webp" alt="Final Rep Logo" class="h-20 w-auto object-contain transition-all duration-300">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto py-6 border-t border-dark-300 text-center text-gray-500 text-sm">
+        <div class="container mx-auto px-6">
+            <div class="mb-4">
+                <p>© 2025 <span class="text-red-600 font-semibold">RIS</span> Calculator. All Rights Reserved.</p>
+            </div>
+            <div class="flex justify-center space-x-4">
+                <a href="https://instagram.com/riiswa" target="_blank" class="text-gray-400 hover:text-white transition-colors">Instagram</a>
+                <a href="https://github.com/riiswa" target="_blank" class="text-gray-400 hover:text-white transition-colors">GitHub</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show content and hide loading overlay
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const mainContent = document.getElementById('main-content');
+
+            // Initialize everything
+            initializePlots();
+            initializeCalculator();
+            initializeConstantsAndFormulas();
+            initializeFAQToggles();
+
+            // Remove loading overlay after a brief delay
+            setTimeout(() => {
+                loadingOverlay.style.opacity = '0';
+                mainContent.style.opacity = '1';
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                }, 500);
+            }, 1000);
+        });
+
+        // Plot Initialization
+        function initializePlots() {
+            const menData = {"data": [{"customdata": {"dtype": "f8", "bdata": "AAAAAACAMUAAAAAAAEBQQAAAAAAAQF9AAAAAAACwbUASC0fhUfYPQAAAAAAAIERAAAAAAAAAWUAAAAAAAGBdQAAAAAAAIGdAOEfELWRHD0AAAAAAAIA7QAAAAAAAcFJAAAAAAAAAYUAAAAAAALBoQOL0QXStBQ1AAAAAAAAAPkAAAAAAAABUQAAAAAAAgFtAAAAAAAAAaUDT0m3A164JQAAAAAAAwDdAAAAAAACQUEAAAAAAAABeQAAAAAAAQGpA09JtwNeuCUAAAAAAAAA5QAAAAAAAcFJAAAAAAAAAXkAAAAAAALBoQFsSEak3CwlAAAAAAAAAOUAAAAAAAMBSQAAAAAAAAFlAAAAAAADgakD/HpDRttoIQAAAAAAAAD5AAAAAAABAVUAAAAAAAIBbQAAAAAAAcGdAkB6noAiECEAAAAAAAMA8QAAAAAAAYFNAAAAAAAAAWUAAAAAAAABpQAAAAAAAAAhA", "shape": "9, 5"}, "hovertemplate": "<b>%{hovertext}</b><br><br>Weight Class=-66kg<br>Body Weight (kg)=%{x}<br>Total=%{y}<br>Muscle Up=%{customdata[0]}<br>Pull Up=%{customdata[1]}<br>Dip=%{customdata[2]}<br>Squat=%{customdata[3]}<extra></extra>", "hovertext": ["Owen Gayle", "Youssef Ashura Bouida", "Julien Capdeville", "Nana Boison", "Domenico Zezza", "Pablo Reveriego", "Alessio Ceragioli", "Florent Geschlecht", "Justin Herbert"], "legendgroup": "-66kg", "marker": {"color": "rgb(165,0,38)", "opacity": 0.7, "size": {"dtype": "f8", "bdata": "EgtH4VH2D0A4R8QtZEcPQOL0QXStBQ1A09JtwNeuCUDT0m3A164JQFsSEak3CwlA/x6Q0bbaCECQHqegCIQIQAAAAAAAAAhA"}, "sizemode": "area", "sizeref": 0.0375, "symbol": "circle"}, "mode": "markers", "name": "-66kg", "orientation": "v", "showlegend": true, "x": {"dtype": "f8", "bdata": "AAAAAACAUEAAAAAAAIBQQGZmZmZmJlBAAAAAAABAUEDNzMzMzExQQAAAAAAAcFBAMzMzMzNTUEAAAAAAAIBQQM3MzMzMjE9A"}, "xaxis": "x", "y": {"dtype": "f8", "bdata": "AAAAAADQe0AAAAAAAKx7QAAAAAAALHtAAAAAAABAekAAAAAAAEB6QAAAAAAABHpAAAAAAADweUAAAAAAAMh5QAAAAAAAZHlA"}, "yaxis": "y", "type": "scatter"}, {"customdata": {"dtype": "f8", "bdata": "AAAAAAAgR0AAAAAAAABbQAAAAAAAsGNAAAAAAADgakAk5wQYYeogQAAAAAAAADlAAAAAAACgVEAAAAAAALhgQAAAAAAAYG5AY0ypko9eF0AAAAAAAOBAQAAAAAAAIFdAAAAAAAAQY0AAAAAAAKBpQC6h+JueQhdAAAAAAAAAPkAAAAAAACBXQAAAAAAAcGJAAAAAAACwaEBluW48UukTQAAAAAAAQEBAAAAAAABAVUAAAAAAAEBgQAAAAAAAQGpAc3auGCgOEkAAAAAAAMBCQAAAAAAAoFRAAAAAAADgX0AAAAAAAEBqQHN2rhgoDhJAAAAAAAAAOUAAAAAAAEBQQAAAAAAAQF9AAAAAAAAQbkBI2yKPTrQRQAAAAAAAwEJAAAAAAABAVUAAAAAAAJBgQAAAAAAAAGlAOL1SDyCeEUAAAAAAAEA/QAAAAAAAAFRAAAAAAAAAXkAAAAAAAIBrQEOlicNr+xBA", "shape": "9, 5"}, "hovertemplate": "<b>%{hovertext}</b><br><br>Weight Class=-73kg<br>Body Weight (kg)=%{x}<br>Total=%{y}<br>Muscle Up=%{customdata[0]}<br>Pull Up=%{customdata[1]}<br>Dip=%{customdata[2]}<br>Squat=%{customdata[3]}<extra></extra>", "hovertext": ["Aubin Chevillard", "Lorenzo Mazzi", "Fran\u00e7ois Li", "Vincenzo Santoro", "Giulio Torelli", "Luca Van Gremberghen", "Israelian Albert", "Lionel Da Silva", "Abderrahmen Dellaoui"], "legendgroup": "-73kg", "marker": {"color": "rgb(215,48,39)", "opacity": 0.7, "size": {"dtype": "f8", "bdata": "JOcEGGHqIEBjTKmSj14XQC6h+JueQhdAZbluPFLpE0Bzdq4YKA4SQHN2rhgoDhJASNsij060EUA4vVIPIJ4RQEOlicNr+xBA"}, "sizemode": "area", "sizeref": 0.0375, "symbol": "circle"}, "mode": "markers", "name": "-73kg", "orientation": "v", "showlegend": true, "x": {"dtype": "f8", "bdata": "AAAAAAAgUkDNzMzMzCxSQJqZmZmZGVJAAAAAAAAgUkAzMzMzMxNSQAEAAAAAIFJAAQAAAAAgUkCamZmZmRlSQM3MzMzMLFJA"}, "xaxis": "x", "y": {"dtype": "f8", "bdata": "AAAAAAB2gEAAAAAAAER+QAAAAAAAPH5AAAAAAAA4fUAAAAAAAJh8QAAAAAAAmHxAAAAAAAB4fEAAAAAAAHB8QAAAAAAANHxA"}, "yaxis": "y", "type": "scatter"}, {"customdata": {"dtype": "f8", "bdata": "AAAAAAAAREAAAAAAAEBaQAAAAAAA0GFAAAAAAAAAbkA441koggQhQAAAAAAAgEZAAAAAAADAV0AAAAAAAABkQAAAAAAAgGtATOiBvuYCIEAAAAAAAIBBQAAAAAAAgFZAAAAAAABgY0AAAAAAACBsQFhwwjYbMhxAAAAAAAAAPkAAAAAAACBXQAAAAAAAAF5AAAAAAABocEBYcMI2GzIcQAAAAAAAgDtAAAAAAABAVUAAAAAAAGBjQAAAAAAAEG1APCXHgTv7GkAAAAAAAAA+QAAAAAAAwFdAAAAAAACwY0AAAAAAADBrQDwlx4E7+xpAAAAAAABAQEAAAAAAAMBSQAAAAAAAQF9AAAAAAABocED8jY+4iswZQAAAAAAAQEBAAAAAAABAVUAAAAAAAOBgQAAAAAAAsG1ATYSHGkOmGEAAAAAAAAA+QAAAAAAAoFRAAAAAAAAAZEAAAAAAADBrQE2EhxpDphhAAAAAAACANkAAAAAAAKBOQAAAAAAAaGBAAAAAAAC4cECAwJMmKf0WQA==", "shape": "10, 5"}, "hovertemplate": "<b>%{hovertext}</b><br><br>Weight Class=-80kg<br>Body Weight (kg)=%{x}<br>Total=%{y}<br>Muscle Up=%{customdata[0]}<br>Pull Up=%{customdata[1]}<br>Dip=%{customdata[2]}<br>Squat=%{customdata[3]}<extra></extra>", "hovertext": ["Raul Teslevici", "Bartlomiej Orchowski", "Shakil Ahmed", "Tony D'Agostino", "Elder Paredes", "Dani\u00ebl Wassenaar", "Cristiano Bellorini", "Abderrahmen Dellaoui", "Carlos Garc\u00eda Pic\u00f3n", "Antonio Sparaneo"], "legendgroup": "-80kg", "marker": {"color": "rgb(244,109,67)", "opacity": 0.7, "size": {"dtype": "f8", "bdata": "OONZKIIEIUBM6IG+5gIgQFhwwjYbMhxAWHDCNhsyHEA8JceBO/saQDwlx4E7+xpA/I2PuIrMGUBNhIcaQ6YYQE2EhxpDphhAgMCTJin9FkA="}, "sizemode": "area", "sizeref": 0.0375, "symbol": "circle"}, "mode": "markers", "name": "-80kg", "orientation": "v", "showlegend": true, "x": {"dtype": "f8", "bdata": "mpmZmZl5U0CamZmZmdlTQAAAAAAAwFNAzczMzMzMU0Acx3Ecx9FTQDMzMzMz01NAmpmZmZnZU0DNzMzMzOxTQM3MzMzM7FNAmpmZmZn5U0A="}, "xaxis": "x", "y": {"dtype": "f8", "bdata": "AAAAAAB8gEAAAAAAAECAQAAAAAAAkH9AAAAAAACQf0AAAAAAAEB/QAAAAAAAQH9AAAAAAADwfkAAAAAAAKB+QAAAAAAAoH5AAAAAAAAofkA="}, "yaxis": "y", "type": "scatter"}, {"customdata": {"dtype": "f8", "bdata": "AAAAAACASkAAAAAAABBdQAAAAAAA0GZAAAAAAAAQbUBmH6dy5JgpQAAAAAAAAERAAAAAAADAV0AAAAAAACBiQAAAAAAAGHBAV9utJ4loIkAAAAAAAAA+QAAAAAAAEFhAAAAAAADgYEAAAAAAAPhwQOt1MDuqvSFAAAAAAABARUAAAAAAAABeQAAAAAAAgGFAAAAAAADAbEBHay1hwrQhQAAAAAAAIEJAAAAAAABAVUAAAAAAAIBhQAAAAAAAQHBAsvIVSEMtIEAAAAAAAAA5QAAAAAAAwFdAAAAAAAAgYkAAAAAAAOBvQEzogb7mAiBAAAAAAAAANEAAAAAAAMBSQAAAAAAAwGJAAAAAAABAcEBYcMI2GzIcQAAAAAAAQEBAAAAAAADAV0AAAAAAACBiQAAAAAAAcGxAPCXHgTv7GkAAAAAAAEBAQAAAAAAA4FVAAAAAAAAgYkAAAAAAAGBtQDwlx4E7+xpAAAAAAADAQkAAAAAAAHBXQAAAAAAAQF9AAAAAAAAQbUAVzuzvCF4YQA==", "shape": "10, 5"}, "hovertemplate": "<b>%{hovertext}</b><br><br>Weight Class=-87kg<br>Body Weight (kg)=%{x}<br>Total=%{y}<br>Muscle Up=%{customdata[0]}<br>Pull Up=%{customdata[1]}<br>Dip=%{customdata[2]}<br>Squat=%{customdata[3]}<extra></extra>", "hovertext": ["Pere Coll Fernandez", "Lucian Stanut", "Timo Wunnenberg", "Ludovic Adamantium", "Amedeo Pulcini", "Jan Walter", "Marc Altarriba Coronado", "Jos\u00e9 D'Almeida", "Kevin Gogo", "Diego Corazza"], "legendgroup": "-87kg", "marker": {"color": "rgb(253,174,97)", "opacity": 0.7, "size": {"dtype": "f8", "bdata": "Zh+ncuSYKUBX260niWgiQOt1MDuqvSFAR2stYcK0IUCy8hVIQy0gQEzogb7mAiBAWHDCNhsyHEA8JceBO/saQDwlx4E7+xpAFc7s7wheGEA="}, "sizemode": "area", "sizeref": 0.0375, "symbol": "circle"}, "mode": "markers", "name": "-87kg", "orientation": "v", "showlegend": true, "x": {"dtype": "f8", "bdata": "AAAAAACAVUBmZmZmZoZVQGZmZmZmxlVAMzMzMzOTVUDNzMzMzGxVQJqZmZmZjVVAmpmZmZmNVUAAAAAAAMBVQJqZmZmZuVVAZmZmZmYmVUA="}, "xaxis": "x", "y": {"dtype": "f8", "bdata": "AAAAAABCgkAAAAAAAMyAQAAAAAAApoBAAAAAAACkgEAAAAAAAEqAQAAAAAAAQIBAAAAAAACQf0AAAAAAAEB/QAAAAAAAQH9AAAAAAACMfkA="}, "yaxis": "y", "type": "scatter"}, {"customdata": {"dtype": "f8", "bdata": "AAAAAADgRUAAAAAAADBbQAAAAAAAoGRAAAAAAABIckAAAAAAAAAuQAAAAAAAAERAAAAAAADgWkAAAAAAAEBlQAAAAAAAkG9ACd6fd6pKJ0AAAAAAAAA+QAAAAAAAIFdAAAAAAACQZUAAAAAAAPBuQEebcB7FHyNAAAAAAAAAOUAAAAAAAMBSQAAAAAAAAGRAAAAAAACYcUDniOqC2foiQAAAAAAAQEBAAAAAAADgVUAAAAAAAIhmQAAAAAAAYG1Aas1JWTQXIkAAAAAAAMBCQAAAAAAAgFtAAAAAAAAgYkAAAAAAAFBuQBkJoQ42DiJAAAAAAAAAPkAAAAAAACBXQAAAAAAAgGFAAAAAAABwcECod6bfAr8gQAAAAAAAQEBAAAAAAABAVUAAAAAAAMBiQAAAAAAAQG9AYmzKiMBdH0AAAAAAAIA2QAAAAAAAQFVAAAAAAADAYkAAAAAAAOBvQP33Vj1OEx5AAAAAAABAQEAAAAAAACBSQAAAAAAAQGBAAAAAAAAIcUDDjfCzi9AcQA==", "shape": "10, 5"}, "hovertemplate": "<b>%{hovertext}</b><br><br>Weight Class=-94kg<br>Body Weight (kg)=%{x}<br>Total=%{y}<br>Muscle Up=%{customdata[0]}<br>Pull Up=%{customdata[1]}<br>Dip=%{customdata[2]}<br>Squat=%{customdata[3]}<extra></extra>", "hovertext": ["Xavier Macias", "Dylan Baki Heurteux", "Th\u00e9o Goutte-Toquet", "Daniel Lisek Lis", "Badr Van Der Stoel", "Ludovic Adamantium", "Timo Wunnenberg", "Robin Stoltze", "Charlie Cameron", "Giovanni Lategana"], "legendgroup": "-94kg", "marker": {"color": "rgb(254,224,144)", "opacity": 0.7, "size": {"dtype": "f8", "bdata": "AAAAAAAALkAJ3p93qkonQEebcB7FHyNA54jqgtn6IkBqzUlZNBciQBkJoQ42DiJAqHem3wK/IEBibMqIwF0fQP33Vj1OEx5Aw43ws4vQHEA="}, "sizemode": "area", "sizeref": 0.0375, "symbol": "circle"}, "mode": "markers", "name": "-94kg", "orientation": "v", "showlegend": true, "x": {"dtype": "f8", "bdata": "zczMzMysVkAAAAAAAEBXQJqZmZmZGVdAmpmZmZl5V0BmZmZmZgZXQM3MzMzMDFdAchzHcRwHV0CamZmZmTlXQGZmZmZm5lZAzczMzMyMVkA="}, "xaxis": "x", "y": {"dtype": "f8", "bdata": "AAAAAAAQg0AAAAAAANCBQAAAAAAA9IBAAAAAAADsgEAAAAAAALqAQAAAAAAAuIBAAAAAAABsgEAAAAAAACyAQAAAAAAABIBAAAAAAAC4f0A="}, "yaxis": "y", "type": "scatter"}, {"customdata": {"dtype": "f8", "bdata": "AAAAAAAA9D8AAAAAAIBWQAAAAAAAwGdAAAAAAADAckAxeuLDmBopQAAAAAAAADRAAAAAAAAgV0AAAAAAAMBiQAAAAAAAYHNASoszBW2wJ0AAAAAAAAA5QAAAAAAAcFdAAAAAAACwY0AAAAAAAHByQEXuFhNzfSdAAAAAAAAANEAAAAAAAIBWQAAAAAAA4GVAAAAAAADQcUAJ3p93qkonQAAAAAAAgCZAAAAAAADQVkAAAAAAALhlQAAAAAAAaHBAzyni0AWWIkAAAAAAAABEQAAAAAAAgFZAAAAAAAAgYkAAAAAAAOBvQBBP5VIwXCFAAAAAAAAAOUAAAAAAAEBVQAAAAAAAQGVAAAAAAAAAbkBM6IG+5gIgQAAAAAAAgEZAAAAAAAAAWUAAAAAAAIBhQAAAAAAAgGtAWHDCNhsyHEAAAAAAAAAUQAAAAAAAIFdAAAAAAADgYEAAAAAAAOhwQK/o/N/JtBtAAAAAAACAMUAAAAAAAEBQQAAAAAAAoF5AAAAAAACocUDWnZFSWhYYQA==", "shape": "10, 5"}, "hovertemplate": "<b>%{hovertext}</b><br><br>Weight Class=+94kg<br>Body Weight (kg)=%{x}<br>Total=%{y}<br>Muscle Up=%{customdata[0]}<br>Pull Up=%{customdata[1]}<br>Dip=%{customdata[2]}<br>Squat=%{customdata[3]}<extra></extra>", "hovertext": ["Valerio Naldi", "Jan Makula", "Leonardo Giliberto", "Tonio Zeidler", "Jovan Mastilovic", "Patryk Dzieniszewski", "Mohamad Houbbi", "Eugeniu Cretu", "Robin Meineke", "Jonas Mees"], "legendgroup": "+94kg", "marker": {"color": "rgb(255,255,191)", "opacity": 0.7, "size": {"dtype": "f8", "bdata": "MXriw5gaKUBKizMFbbAnQEXuFhNzfSdACd6fd6pKJ0DPKeLQBZYiQBBP5VIwXCFATOiBvuYCIEBYcMI2GzIcQK/o/N/JtBtA1p2RUloWGEA="}, "sizemode": "area", "sizeref": 0.0375, "symbol": "circle"}, "mode": "markers", "name": "+94kg", "orientation": "v", "showlegend": true, "x": {"dtype": "f8", "bdata": "ZmZmZmbmXkCamZmZmblaQM3MzMzMzFhAzczMzMysW0AAAAAAAABcQM3MzMzMbFhAUrgeheuhWEDNzMzMzIxZQAAAAAAAwFtAAAAAAADAV0A="}, "xaxis": "x", "y": {"dtype": "f8", "bdata": "AAAAAAAqgkAAAAAAAOSBQAAAAAAA2oFAAAAAAADQgUAAAAAAANaAQAAAAAAAkIBAAAAAAABAgEAAAAAAAJB/QAAAAAAAcH9AAAAAAAB4fkA="}, "yaxis": "y", "type": "scatter"}, {"hovertemplate": "Body Weight: %{x:.1f} kg<br>Predicted Total: %{y:.1f}<extra></extra>", "line": {"color": "white", "dash": "solid", "width": 3}, "mode": "lines", "name": "Trend", "x": {"dtype": "f8", "bdata": "AAAAwMyMSkBToNZv4fRKQKZArR/2XEtA+OCDzwrFS0BLgVp/Hy1MQJ4hMS80lUxA8MEH30j9TEBDYt6OXWVNQJYCtT5yzU1A6aKL7oY1TkA8Q2Kem51OQI7jOE6wBU9A4YMP/sRtT0A0JOat2dVPQENi3i73HlBAbbLJhgFTUECWArXeC4dQQL9SoDYWu1BA6aKLjiDvUEAS83bmKiNRQDxDYj41V1FAZZNNlj+LUUCO4zjuSb9RQLgzJEZU81FA4YMPnl4nUkAK1Pr1aFtSQDQk5k1zj1JAXXTRpX3DUkCGxLz9h/dSQLAUqFWSK1NA2WSTrZxfU0ACtX4Fp5NTQCwFal2xx1NAVlVVtbv7U0B/pUANxi9UQKj1K2XQY1RA0kUXvdqXVED7lQIV5ctUQCTm7Wzv/1RATjbZxPkzVUB3hsQcBGhVQKDWr3QOnFVAyiabzBjQVUDzdoYkIwRWQBzHcXwtOFZARhdd1DdsVkBvZ0gsQqBWQJi3M4RM1FZAwgcf3FYIV0DsVwo0YTxXQBWo9YtrcFdAPvjg43WkV0BoSMw7gNhXQJGYt5OKDFhAuuii65RAWEDkOI5Dn3RYQA2JeZupqFhANtlk87PcWEBgKVBLvhBZQIl5O6PIRFlAsskm+9J4WUDcGRJT3axZQAVq/arn4FlALrroAvIUWkBYCtRa/EhaQIJav7IGfVpAq6qqChGxWkDU+pViG+VaQP5KgbolGVtAJ5tsEjBNW0BQ61dqOoFbQHo7Q8JEtVtAo4suGk/pW0DM2xlyWR1cQPYrBcpjUVxAH3zwIW6FXEBIzNt5eLlcQHIcx9GC7VxAm2yyKY0hXUDFvJ2Bl1VdQO4MidmhiV1AF110May9XUBBrV+JtvFdQGr9SuHAJV5AlE02OctZXkC9nSGR1Y1eQObtDOnfwV5AED74QOr1XkA5juOY9ClfQGLezvD+XV9AjC66SAmSX0C1fqWgE8ZfQN7OkPgd+l9AhA8+KBQXYECYtzNUGTFgQK5fKYAeS2BAwgcfrCNlYEDWrxTYKH9gQOxXCgQumWBAAAAAMDOzYEA="}, "y": {"dtype": "f8", "bdata": "HmjUGnzzdkA4xfMj7Bl3QEeAEhvtQndAOXFKxJFud0Dmkr9C6Zx3QJhcXmn+zXdAM2bICdcBeED4a8BGczh4QBqlSfDMcXhAvZBo8NateEDv5+3PfOx4QIYi2FqiLXlAQBGQayNxeUD6vYHj07Z5QN1sTNZ//nlAkV3+6utHekBAdJr01ZJ6QMD0m8D13npAnI13F/4re0B3m2ronXl7QAmyd5eBx3tAz6FuYlQVfECPhHvQwWJ8QNQIFB93r3xAB2tDnyT7fEA+d0j3fkV9QPU/Hz5Ajn1Aw/zD6CjVfUCy8oyDABp+QISRsDSWXH5AMky2B8GcfkD8sP0DYNp+QLjIkxJaFX9A0D4juZ1Nf0DsvN2wIIN/QMCqzWDftX9AflYaQ9zlf0Byxz+ejwmAQOSDUXbaHoBAV2qS/tYygECimC06j0WAQGI42IcOV4BAqzVSVGFngEDDp0bTlHaAQJpVM7+2hIBA9symINWRgEAbF9wc/p2AQMb9gcs/qYBAEA1RE6izgEDbgfWMRL2AQBlSv2sixoBAd46Aa07OgECirP/C1NWAQNAiZhrB3IBArqAahR7jgED52H9+9+iAQPQrHOlV7oBAzcC6D0PzgEDmFCOox/eAQCBDENfr+4BA9OscNbf/gEClgWPUMAOBQCGonEZfBoFAGkeOo0gJgUAa3KWP8guBQKiQn0JiDoFA4aMhjpwQgUBG6DjkpRKBQNOBp12CFIFACMr6vzUWgUDJW2CDwxeBQD7bNNguGYFAdChJrHoagUBDX9yvqRuBQLRiSlq+HIFAysNv7rodgUCvpsR+oR6BQDToMPFzH4FA5DmcAjQggUCQOz1K4yCBQGXNqjyDIYFArvKyLhUigUA6qPpXmiKBQHUNatUTI4FAwTBoq4IjgUAiuOnH5yOBQDGCVQREJIFAVzlCJ5gkgUDrrg/m5CSBQDytXuYqJYFAqMhpv2olgUCjkEH7pCWBQNZa7hfaJYFA+7x5iAomgUB4peG1NiaBQObf9v9eJoFATLEovoMmgUBDGD9ApSaBQGAfBc/DJoFAM5TkrN8mgUA="}, "type": "scatter"}], "layout": {"template": {"data": {"barpolar": [{"marker": {"line": {"color": "rgb(17,17,17)", "width": 0.5}, "pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "barpolar"}], "bar": [{"error_x": {"color": "#f2f5fa"}, "error_y": {"color": "#f2f5fa"}, "marker": {"line": {"color": "rgb(17,17,17)", "width": 0.5}, "pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "bar"}], "carpet": [{"aaxis": {"endlinecolor": "#A2B1C6", "gridcolor": "#506784", "linecolor": "#506784", "minorgridcolor": "#506784", "startlinecolor": "#A2B1C6"}, "baxis": {"endlinecolor": "#A2B1C6", "gridcolor": "#506784", "linecolor": "#506784", "minorgridcolor": "#506784", "startlinecolor": "#A2B1C6"}, "type": "carpet"}], "choropleth": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "choropleth"}], "contourcarpet": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "contourcarpet"}], "contour": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "contour"}], "heatmap": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "heatmap"}], "histogram2dcontour": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "histogram2dcontour"}], "histogram2d": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "histogram2d"}], "histogram": [{"marker": {"pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "histogram"}], "mesh3d": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "mesh3d"}], "parcoords": [{"line": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "parcoords"}], "pie": [{"automargin": true, "type": "pie"}], "scatter3d": [{"line": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatter3d"}], "scattercarpet": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattercarpet"}], "scattergeo": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattergeo"}], "scattergl": [{"marker": {"line": {"color": "#283442"}}, "type": "scattergl"}], "scattermapbox": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattermapbox"}], "scattermap": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattermap"}], "scatterpolargl": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterpolargl"}], "scatterpolar": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterpolar"}], "scatter": [{"marker": {"line": {"color": "#283442"}}, "type": "scatter"}], "scatterternary": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterternary"}], "surface": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "surface"}], "table": [{"cells": {"fill": {"color": "#506784"}, "line": {"color": "rgb(17,17,17)"}}, "header": {"fill": {"color": "#2a3f5f"}, "line": {"color": "rgb(17,17,17)"}}, "type": "table"}]}, "layout": {"annotationdefaults": {"arrowcolor": "#f2f5fa", "arrowhead": 0, "arrowwidth": 1}, "autotypenumbers": "strict", "coloraxis": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "colorscale": {"diverging": [[0, "#8e0152"], [0.1, "#c51b7d"], [0.2, "#de77ae"], [0.3, "#f1b6da"], [0.4, "#fde0ef"], [0.5, "#f7f7f7"], [0.6, "#e6f5d0"], [0.7, "#b8e186"], [0.8, "#7fbc41"], [0.9, "#4d9221"], [1, "#276419"]], "sequential": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "sequentialminus": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]]}, "colorway": ["#636efa", "#EF553B", "#00cc96", "#ab63fa", "#FFA15A", "#19d3f3", "#FF6692", "#B6E880", "#FF97FF", "#FECB52"], "font": {"color": "#f2f5fa"}, "geo": {"bgcolor": "rgb(17,17,17)", "lakecolor": "rgb(17,17,17)", "landcolor": "rgb(17,17,17)", "showlakes": true, "showland": true, "subunitcolor": "#506784"}, "hoverlabel": {"align": "left"}, "hovermode": "closest", "mapbox": {"style": "dark"}, "paper_bgcolor": "rgb(17,17,17)", "plot_bgcolor": "rgb(17,17,17)", "polar": {"angularaxis": {"gridcolor": "#506784", "linecolor": "#506784", "ticks": ""}, "bgcolor": "rgb(17,17,17)", "radialaxis": {"gridcolor": "#506784", "linecolor": "#506784", "ticks": ""}}, "scene": {"xaxis": {"backgroundcolor": "rgb(17,17,17)", "gridcolor": "#506784", "gridwidth": 2, "linecolor": "#506784", "showbackground": true, "ticks": "", "zerolinecolor": "#C8D4E3"}, "yaxis": {"backgroundcolor": "rgb(17,17,17)", "gridcolor": "#506784", "gridwidth": 2, "linecolor": "#506784", "showbackground": true, "ticks": "", "zerolinecolor": "#C8D4E3"}, "zaxis": {"backgroundcolor": "rgb(17,17,17)", "gridcolor": "#506784", "gridwidth": 2, "linecolor": "#506784", "showbackground": true, "ticks": "", "zerolinecolor": "#C8D4E3"}}, "shapedefaults": {"line": {"color": "#f2f5fa"}}, "sliderdefaults": {"bgcolor": "#C8D4E3", "bordercolor": "rgb(17,17,17)", "borderwidth": 1, "tickwidth": 0}, "ternary": {"aaxis": {"gridcolor": "#506784", "linecolor": "#506784", "ticks": ""}, "baxis": {"gridcolor": "#506784", "linecolor": "#506784", "ticks": ""}, "bgcolor": "rgb(17,17,17)", "caxis": {"gridcolor": "#506784", "linecolor": "#506784", "ticks": ""}}, "title": {"x": 0.05}, "updatemenudefaults": {"bgcolor": "#506784", "borderwidth": 0}, "xaxis": {"automargin": true, "gridcolor": "#283442", "linecolor": "#506784", "ticks": "", "title": {"standoff": 15}, "zerolinecolor": "#283442", "zerolinewidth": 2}, "yaxis": {"automargin": true, "gridcolor": "#283442", "linecolor": "#506784", "ticks": "", "title": {"standoff": 15}, "zerolinecolor": "#283442", "zerolinewidth": 2}}}, "xaxis": {"anchor": "y", "domain": [0.0, 1.0], "title": {"text": "Body Weight (kg)"}, "fixedrange": true, "tickvals": [66, 73, 80, 87, 94, 101, 108, 115, 122, 129, 136, 143, 150, 157, 164, 171, 178, 185, 192, 199]}, "yaxis": {"anchor": "x", "domain": [0.0, 1.0], "title": {"text": "Total"}, "fixedrange": true}, "legend": {"title": {"text": "Weight Class"}, "tracegroupgap": 0, "itemsizing": "constant"}, "title": {"text": "Men", "x": 0.5}, "margin": {"l": 0, "r": 0, "t": 30, "b": 0}, "paper_bgcolor": "#0F0F0F", "plot_bgcolor": "#0F0F0F", "showlegend": false}};
+            const womenData = {"data": [{"customdata": {"dtype": "f8", "bdata": "AAAAAACAK0AAAAAAAIBBQAAAAAAAgEtAAAAAAABAYED2U+FZFQcWQAAAAAAAACRAAAAAAABAQEAAAAAAACBMQAAAAAAAkGBAshOBYmAAFUAAAAAAAAAuQAAAAAAAAD5AAAAAAABASkAAAAAAAEBfQM6/0k5atxFAAAAAAAAAKUAAAAAAAABGQAAAAAAAgEtAAAAAAABAWkAL32Ju04kPQAAAAAAAACRAAAAAAACAQUAAAAAAAEBKQAAAAAAAIFxAoDFGvBv7C0AAAAAAAAAEQAAAAAAAQEVAAAAAAABgSEAAAAAAAMBcQIS9yAgsYwtAAAAAAAAAHkAAAAAAAMBCQAAAAAAAAElAAAAAAACAW0C40chvAdAJQAAAAAAAACRAAAAAAACAO0AAAAAAAIBGQAAAAAAAAF5AYQYWoBH2CEAAAAAAAAAeQAAAAAAAgDZAAAAAAAAASUAAAAAAAABeQKAKz6o4UAhAAAAAAAAA+D8AAAAAAIA2QAAAAAAAoElAAAAAAACgXkAAAAAAAAAIQA==", "shape": "10, 5"}, "hovertemplate": "<b>%{hovertext}</b><br><br>Weight Class=-52kg<br>Body Weight (kg)=%{x}<br>Total=%{y}<br>Muscle Up=%{customdata[0]}<br>Pull Up=%{customdata[1]}<br>Dip=%{customdata[2]}<br>Squat=%{customdata[3]}<extra></extra>", "hovertext": ["Aurora Riccardi", "Ludivine Compain", "Ana\u00efs Lozano Rojas", "C\u00e9line Chatelain", "Clementine Griffo", "Mona Shafiei", "Eleni Christinaki", "Sarah Taylor", "Miriam Scheld", "Agathe Casanova"], "legendgroup": "-52kg", "marker": {"color": "rgb(165,0,38)", "opacity": 0.7, "size": {"dtype": "f8", "bdata": "9lPhWRUHFkCyE4FiYAAVQM6/0k5atxFAC99ibtOJD0CgMUa8G/sLQIS9yAgsYwtAuNHIbwHQCUBhBhagEfYIQKAKz6o4UAhAAAAAAAAACEA="}, "sizemode": "area", "sizeref": 0.0375, "symbol": "circle"}, "mode": "markers", "name": "-52kg", "orientation": "v", "showlegend": true, "x": {"dtype": "f8", "bdata": "mpmZmZnZSUDNzMzMzExJQJqZmZmZeUlAMzMzMzMzSUBmZmZmZmZJQM3MzMzMTElAAAAAAADgSUAAAAAAAEBJQDMzMzMzs0lAZmZmZmZmSUA="}, "xaxis": "x", "y": {"dtype": "f8", "bdata": "AAAAAAA4bUAAAAAAAOhsQAAAAAAA0GtAAAAAAAAQa0AAAAAAAEBqQAAAAAAAGGpAAAAAAACgaUAAAAAAAFBpQAAAAAAAAGlAAAAAAAC4aEA="}, "yaxis": "y", "type": "scatter"}, {"customdata": {"dtype": "f8", "bdata": "AAAAAAAALkAAAAAAACBMQAAAAAAAAFRAAAAAAADgYEA/Gpc7VVMpQAAAAAAAgCZAAAAAAAAAPkAAAAAAAEBQQAAAAAAAYGNAVBz6j+K+IUAAAAAAAAAeQAAAAAAAgEFAAAAAAABAUEAAAAAAABBjQLVkNpSJZiFAAAAAAAAANEAAAAAAACBHQAAAAAAAQFBAAAAAAADgX0BQZ4CMEg8hQAAAAAAAgDtAAAAAAADATEAAAAAAAEBQQAAAAAAAQFpADAbwkxAOIEAAAAAAAAAuQAAAAAAAQEVAAAAAAABgTUAAAAAAAEBgQIBvmcsyrhtAAAAAAAAANEAAAAAAAABJQAAAAAAAAElAAAAAAAAAXkCQhecb0r8YQAAAAAAAgDFAAAAAAACARkAAAAAAAEBPQAAAAAAAgFtAjp5rjPCNFkAAAAAAAIAxQAAAAAAAgEZAAAAAAAAASUAAAAAAAABeQEaKRG6MghVAAAAAAAAAGUAAAAAAAKBEQAAAAAAAoElAAAAAAACQYECyE4FiYAAVQA==", "shape": "10, 5"}, "hovertemplate": "<b>%{hovertext}</b><br><br>Weight Class=-57kg<br>Body Weight (kg)=%{x}<br>Total=%{y}<br>Muscle Up=%{customdata[0]}<br>Pull Up=%{customdata[1]}<br>Dip=%{customdata[2]}<br>Squat=%{customdata[3]}<extra></extra>", "hovertext": ["Nadine Hettinga", "Sofia Cerdan Bes", "Julie Brion", "Margaux Sanchez", "Martha Lubczynski", "Julia L\u00e4ngerer", "Kara Smith", "Laura Garc\u00eda Bitrian", "Lylia Ammour", "Lorena Latrelle"], "legendgroup": "-57kg", "marker": {"color": "rgb(215,48,39)", "opacity": 0.7, "size": {"dtype": "f8", "bdata": "PxqXO1VTKUBUHPqP4r4hQLVkNpSJZiFAUGeAjBIPIUAMBvCTEA4gQIBvmcsyrhtAkIXnG9K/GECOnmuM8I0WQEaKRG6MghVAshOBYmAAFUA="}, "sizemode": "area", "sizeref": 0.0375, "symbol": "circle"}, "mode": "markers", "name": "-57kg", "orientation": "v", "showlegend": true, "x": {"dtype": "f8", "bdata": "ZmZmZmZmTEBmZmZmZiZMQGZmZmZmBkxAZmZmZmbmS0AAAAAAAABMQJqZmZmZGUtAzczMzMxMTEBmZmZmZgZMQAAAAAAAgExAmpmZmZnZS0A="}, "xaxis": "x", "y": {"dtype": "f8", "bdata": "AAAAAADkcUAAAAAAAFRwQAAAAAAAQHBAAAAAAAAscEAAAAAAAOBvQAAAAAAAyG5AAAAAAAAAbkAAAAAAAGBtQAAAAAAAEG1AAAAAAADobEA="}, "yaxis": "y", "type": "scatter"}, {"customdata": {"dtype": "f8", "bdata": "AAAAAAAALkAAAAAAAKBEQAAAAAAAgFFAAAAAAADQYUBtaFGyCOMjQAAAAAAAgCtAAAAAAADgRUAAAAAAAMBSQAAAAAAA4GBAGimYwpCFI0AAAAAAAAAZQAAAAAAAoERAAAAAAAAATkAAAAAAAMBiQJJ1kMZ/uCBAAAAAAAAANEAAAAAAAIBGQAAAAAAAwExAAAAAAACQYEAMBvCTEA4gQAAAAAAAwDJAAAAAAACgREAAAAAAAKBOQAAAAAAA4F9ArWNuYoroHEAAAAAAAAApQAAAAAAAoERAAAAAAACgTkAAAAAAAEBgQOqdl7wDFBtAAAAAAAAAKUAAAAAAAMBHQAAAAAAAgFFAAAAAAADAXEDqnZe8AxQbQAAAAAAAgDFAAAAAAAAAPkAAAAAAAEBPQAAAAAAAkGBAH7QtwcDlGUAAAAAAAAAeQAAAAAAA4EBAAAAAAACAS0AAAAAAADBhQPZT4VkVBxZAAAAAAAAAHkAAAAAAAABEQAAAAAAAgEtAAAAAAABAYEDOTEUgu1EZQA==", "shape": "10, 5"}, "hovertemplate": "<b>%{hovertext}</b><br><br>Weight Class=-63kg<br>Body Weight (kg)=%{x}<br>Total=%{y}<br>Muscle Up=%{customdata[0]}<br>Pull Up=%{customdata[1]}<br>Dip=%{customdata[2]}<br>Squat=%{customdata[3]}<extra></extra>", "hovertext": ["Laura Garc\u00eda Bitrian", "Faye Butler", "Ines Marius", "Lylia Ammour", "Mar Martinez", "Jelena Mladenovic", "Gianna Webbe", "Nadine Schulz", "Veronika Martin\u010di\u010d", "Taru Riipinen"], "legendgroup": "-63kg", "marker": {"color": "rgb(244,109,67)", "opacity": 0.7, "size": {"dtype": "f8", "bdata": "bWhRsgjjI0AaKZjCkIUjQJJ1kMZ/uCBADAbwkxAOIECtY25iiugcQOqdl7wDFBtA6p2XvAMUG0AftC3BwOUZQPZT4VkVBxZAzkxFILtRGUA="}, "sizemode": "area", "sizeref": 0.0375, "symbol": "circle"}, "mode": "markers", "name": "-63kg", "orientation": "v", "showlegend": true, "x": {"dtype": "f8", "bdata": "ZmZmZmYmT0AzMzMzMzNOQGZmZmZmJk9AzczMzMyMTkAzMzMzM/NOQJqZmZmZGU9AwhZswRbsTkCamZmZmVlPQAAAAAAAwE5AmpmZmZkZT0A="}, "xaxis": "x", "y": {"dtype": "f8", "bdata": "AAAAAADMcEAAAAAAALhwQAAAAAAAGHBAAAAAAADgb0AAAAAAABhvQAAAAAAAoG5AAAAAAACgbkAAAAAAAFBuQAAAAAAAOG1AAAAAAAAobkA="}, "yaxis": "y", "type": "scatter"}, {"customdata": {"dtype": "f8", "bdata": "AAAAAABANUAAAAAAAGBIQAAAAAAAcFJAAAAAAADQYUA/Gpc7VVMpQAAAAAAAAC5AAAAAAAAgQkAAAAAAACBSQAAAAAAAYGNArj2sB/TrJkAAAAAAAAAkQAAAAAAA4EBAAAAAAAAATkAAAAAAAGBkQKfZ6VXiTSNAAAAAAABAMEAAAAAAAIBBQAAAAAAA0FJAAAAAAACAYUBLJFACZDsjQAAAAAAAgCZAAAAAAAAASUAAAAAAAEBPQAAAAAAAgGFArpdzgzFyIkAAAAAAAIA2QAAAAAAAgEZAAAAAAACAS0AAAAAAAIBhQM7vk0MbGCJAAAAAAAAAKUAAAAAAACBMQAAAAAAA4E9AAAAAAADgX0C1ZDaUiWYhQAAAAAAAADRAAAAAAAAAREAAAAAAAIBRQAAAAAAAQGBAtWQ2lIlmIUAAAAAAAEA1QAAAAAAAAElAAAAAAABAT0AAAAAAAKBeQNjGiKLTYiBAAAAAAACANkAAAAAAAKBEQAAAAAAAYE1AAAAAAACQYEAMBvCTEA4gQA==", "shape": "10, 5"}, "hovertemplate": "<b>%{hovertext}</b><br><br>Weight Class=-70kg<br>Body Weight (kg)=%{x}<br>Total=%{y}<br>Muscle Up=%{customdata[0]}<br>Pull Up=%{customdata[1]}<br>Dip=%{customdata[2]}<br>Squat=%{customdata[3]}<extra></extra>", "hovertext": ["Christina Fr\u00f6hlich", "Lynn Narings", "Milana Popovic", "Nadine Schulz", "Florence Wong", "Sarah Anyamele", "Danae Morgan", "Caroline Vernier", "Karla Ramsden", "Axelle Ditacroute"], "legendgroup": "-70kg", "marker": {"color": "rgb(253,174,97)", "opacity": 0.7, "size": {"dtype": "f8", "bdata": "PxqXO1VTKUCuPawH9OsmQKfZ6VXiTSNASyRQAmQ7I0Cul3ODMXIiQM7vk0MbGCJAtWQ2lIlmIUC1ZDaUiWYhQNjGiKLTYiBADAbwkxAOIEA="}, "sizemode": "area", "sizeref": 0.0375, "symbol": "circle"}, "mode": "markers", "name": "-70kg", "orientation": "v", "showlegend": true, "x": {"dtype": "f8", "bdata": "ZmZmZmYGUUAzMzMzMzNRQAAAAAAAIFFAZmZmZmYmUUCamZmZmblQQDMzMzMzE1FAZmZmZmbmUEBVVVVVVfVQQAAAAAAA4FBAzczMzMyMUEA="}, "xaxis": "x", "y": {"dtype": "f8", "bdata": "AAAAAADkcUAAAAAAAGxxQAAAAAAArHBAAAAAAACocEAAAAAAAHxwQAAAAAAAaHBAAAAAAABAcEAAAAAAAEBwQAAAAAAABHBAAAAAAADgb0A="}, "yaxis": "y", "type": "scatter"}, {"customdata": {"dtype": "f8", "bdata": "AAAAAAAAOUAAAAAAAABEQAAAAAAA4FBAAAAAAADwZEAAAAAAAAAuQAAAAAAAAB5AAAAAAABARUAAAAAAAMBSQAAAAAAAsGNA31eWHj0cKEAAAAAAAAApQAAAAAAA4EpAAAAAAAAATkAAAAAAAIBhQKv4U0juKCNAAAAAAAAAAAAAAAAAAEBAQAAAAAAAQEpAAAAAAAAAZEDqnZe8AxQbQAAAAAAAABRAAAAAAADAQkAAAAAAAEBKQAAAAAAAIGJAkIXnG9K/GEAAAAAAAAAEQAAAAAAAQEVAAAAAAACAUUAAAAAAAEBfQJCF5xvSvxhAAAAAAACAJkAAAAAAAKBJQAAAAAAAIE1AAAAAAABgXUC02+CkDTAYQAAAAAAAAARAAAAAAACAQUAAAAAAAIBLQAAAAAAAQGBAzr/STlq3EUAAAAAAAAAUQAAAAAAAQEBAAAAAAAAASUAAAAAAAEBgQAsIa1IgExBAAAAAAAAAKUAAAAAAAIBBQAAAAAAAAElAAAAAAAAAXkALCGtSIBMQQA==", "shape": "10, 5"}, "hovertemplate": "<b>%{hovertext}</b><br><br>Weight Class=+70kg<br>Body Weight (kg)=%{x}<br>Total=%{y}<br>Muscle Up=%{customdata[0]}<br>Pull Up=%{customdata[1]}<br>Dip=%{customdata[2]}<br>Squat=%{customdata[3]}<extra></extra>", "hovertext": ["Sarah Anyamele", "Maria Gajevskaja", "Claudia Van Osch", "Elena Paradiso", "Judith Kleinhansl", "Katerina Najmanov\u00e1", "Malgorzata Luckner", "Anastasija Odzic", "Anais Dethier", "Eva-Sophie M\u00f6rschel"], "legendgroup": "+70kg", "marker": {"color": "rgb(254,224,144)", "opacity": 0.7, "size": {"dtype": "f8", "bdata": "AAAAAAAALkDfV5YePRwoQKv4U0juKCNA6p2XvAMUG0CQhecb0r8YQJCF5xvSvxhAtNvgpA0wGEDOv9JOWrcRQAsIa1IgExBACwhrUiATEEA="}, "sizemode": "area", "sizeref": 0.0375, "symbol": "circle"}, "mode": "markers", "name": "+70kg", "orientation": "v", "showlegend": true, "x": {"dtype": "f8", "bdata": "MzMzMzMTUkAzMzMzM9NRQGZmZmZmhlJAmpmZmZkpUkAzMzMzM3NSQJqZmZmZuVNAZmZmZmamUUBmZmZmZoZRQJqZmZmZ2VFAAAAAAADAUUA="}, "xaxis": "x", "y": {"dtype": "f8", "bdata": "AAAAAADAckAAAAAAAKhxQAAAAAAApHBAAAAAAACgbkAAAAAAAABuQAAAAAAAAG5AAAAAAADYbUAAAAAAANBrQAAAAAAAMGtAAAAAAAAwa0A="}, "yaxis": "y", "type": "scatter"}, {"hovertemplate": "Body Weight: %{x:.1f} kg<br>Predicted Total: %{y:.1f}<extra></extra>", "line": {"color": "white", "dash": "solid", "width": 3}, "mode": "lines", "name": "Trend", "x": {"dtype": "f8", "bdata": "AAAAQDMzREDU+pVC6HFEQKj1K0WdsERAfPDBR1LvREBQ61dKBy5FQCTm7Uy8bEVA+OCDT3GrRUDM2xlSJupFQKDWr1TbKEZAdNFFV5BnRkBIzNtZRaZGQBzHcVz65EZA8MEHX68jR0DEvJ1hZGJHQJi3M2QZoUdAbbLJZs7fR0BBrV9pgx5IQBWo9Ws4XUhA6aKLbu2bSEC9nSFxotpIQJGYt3NXGUlAZZNNdgxYSUA5juN4wZZJQA2JeXt21UlA4YMPfisUSkC1fqWA4FJKQIl5O4OVkUpAXXTRhUrQSkAxb2eI/w5LQAVq/Yq0TUtA2WSTjWmMS0CtXymQHstLQIFav5LTCUxAVlVVlYhITEAqUOuXPYdMQP5KgZryxUxA0kUXnacETUCmQK2fXENNQHo7Q6IRgk1ATjbZpMbATUAiMW+ne/9NQPYrBaowPk5AyiabrOV8TkCeITGvmrtOQHIcx7FP+k5ARhddtAQ5T0AaEvO2uXdPQO4Miblutk9AwgcfvCP1T0BLgVpf7BlQQLV+peBGOVBAH3zwYaFYUECJeTvj+3dQQPN2hmRWl1BAXXTR5bC2UEDHcRxnC9ZQQDFvZ+hl9VBAm2yyacAUUUAFav3qGjRRQG9nSGx1U1FA2WST7c9yUUBDYt5uKpJRQK1fKfCEsVFAF110cd/QUUCBWr/yOfBRQOtXCnSUD1JAVlVV9e4uUkDAUqB2SU5SQCpQ6/ejbVJAlE02ef6MUkD+SoH6WKxSQGhIzHuzy1JA0kUX/Q3rUkA8Q2J+aApTQKZArf/CKVNAED74gB1JU0B6O0MCeGhTQOQ4joPSh1NATjbZBC2nU0C4MySGh8ZTQCIxbwfi5VNAjC66iDwFVED2KwUKlyRUQGApUIvxQ1RAyiabDExjVEA0JOaNpoJUQJ4hMQ8BolRACB98kFvBVEByHMcRtuBUQNwZEpMQAFVARhddFGsfVUCwFKiVxT5VQBoS8xYgXlVAhA8+mHp9VUDuDIkZ1ZxVQFgK1JovvFVAwgcfHIrbVUAsBWqd5PpVQJYCtR4/GlZAAAAAoJk5VkA="}, "y": {"dtype": "f8", "bdata": "3XKIDB4YZ0DTxoeN5zxnQDLagVwtY2dAcie9Ue+KZ0B6a3B2K7RnQGTs/+Td3mdA1BCOrAALaEAmB7m4izhoQGnhXr50Z2hAK146Lq+XaED16hsuLMloQDDca5na+2hA+UuECacvaUCW3Erme2RpQNp1RX9BmmlAtiYyLd7QaUDOLvN7NghqQODEZlwtQGpAnquIXaR4akDkcATse7FqQFm1LJeT6mpAGmUgWsoja0Cpa8Tn/lxrQC3SIPgPlmtAQ4mkldzOa0Bz9dNoRAdsQEWj8wAoP2xAeaRZGGl2bEB5xTPT6qxsQDlOvfeR4mxAXkISH0UXbUBAvAXe7EptQCChmuVzfW1Aei33GseubUCVieKm1d5tQA/VDf2QDW5A2GCW2+w6bkBMCFRD32ZuQDAYpGlgkW5AkLR2pGq6bkDcU3JR+uFuQFQgB7kNCG9AJJNL7qQsb0BOSHWswU9vQPndtTJncW9AT7Y0H5qRb0BHscxJYLBvQE9jIZ/AzW9AnNGK/MLpb0CEDKEGOAJwQJSekpToDnBA5pqqGvgacECqxW/DayZwQH5ZyuNIMXBA8gWP7pQ7cEDI9yxpVUVwQDLdfOGPTnBA5nmq5ElXcEDg2i73iF9wQAt/zo1SZ3BAF8SMB6xucEDrgISomnVwQCzblJUjfHBAvP7Q0EuCcEC0WKE2GIhwQAhBhXuNjXBAuoVkKrCScED/AWGjhJdwQKhFGRsPnHBAnkJOmlOgcEAs9t79VaRwQCoKDvcZqHBA63AGDKOrcEAYAZWY9K5wQIgQDs8RsnBA3ftWuf20cEBWagw6u7dwQIbwvg1NunBAenhAzLW8cECaiv3p975wQJg3XrkVwXBAB/oqbBHDcEDcbfIU7cRwQB82baiqxnBAENbd/kvIcED3o2rV0slwQMRRcM9Ay3BA7NLLd5fMcEBqqRpC2M1wQCbd8IsEz3BAJhMEnh3QcED8ZEutJNFwQJC9E9wa0nBAAKAIOwHTcECQVzHK2NNwQOil4nmi1HBALBelK1/VcEB3MhCzD9ZwQGrJmta01nBAGrNgUE/XcEA="}, "type": "scatter"}], "layout": {"template": {"data": {"barpolar": [{"marker": {"line": {"color": "rgb(17,17,17)", "width": 0.5}, "pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "barpolar"}], "bar": [{"error_x": {"color": "#f2f5fa"}, "error_y": {"color": "#f2f5fa"}, "marker": {"line": {"color": "rgb(17,17,17)", "width": 0.5}, "pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "bar"}], "carpet": [{"aaxis": {"endlinecolor": "#A2B1C6", "gridcolor": "#506784", "linecolor": "#506784", "minorgridcolor": "#506784", "startlinecolor": "#A2B1C6"}, "baxis": {"endlinecolor": "#A2B1C6", "gridcolor": "#506784", "linecolor": "#506784", "minorgridcolor": "#506784", "startlinecolor": "#A2B1C6"}, "type": "carpet"}], "choropleth": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "choropleth"}], "contourcarpet": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "contourcarpet"}], "contour": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "contour"}], "heatmap": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "heatmap"}], "histogram2dcontour": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "histogram2dcontour"}], "histogram2d": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "histogram2d"}], "histogram": [{"marker": {"pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "histogram"}], "mesh3d": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "mesh3d"}], "parcoords": [{"line": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "parcoords"}], "pie": [{"automargin": true, "type": "pie"}], "scatter3d": [{"line": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatter3d"}], "scattercarpet": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattercarpet"}], "scattergeo": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattergeo"}], "scattergl": [{"marker": {"line": {"color": "#283442"}}, "type": "scattergl"}], "scattermapbox": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattermapbox"}], "scattermap": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattermap"}], "scatterpolargl": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterpolargl"}], "scatterpolar": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterpolar"}], "scatter": [{"marker": {"line": {"color": "#283442"}}, "type": "scatter"}], "scatterternary": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterternary"}], "surface": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "type": "surface"}], "table": [{"cells": {"fill": {"color": "#506784"}, "line": {"color": "rgb(17,17,17)"}}, "header": {"fill": {"color": "#2a3f5f"}, "line": {"color": "rgb(17,17,17)"}}, "type": "table"}]}, "layout": {"annotationdefaults": {"arrowcolor": "#f2f5fa", "arrowhead": 0, "arrowwidth": 1}, "autotypenumbers": "strict", "coloraxis": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "colorscale": {"diverging": [[0, "#8e0152"], [0.1, "#c51b7d"], [0.2, "#de77ae"], [0.3, "#f1b6da"], [0.4, "#fde0ef"], [0.5, "#f7f7f7"], [0.6, "#e6f5d0"], [0.7, "#b8e186"], [0.8, "#7fbc41"], [0.9, "#4d9221"], [1, "#276419"]], "sequential": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]], "sequentialminus": [[0.0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1.0, "#f0f921"]]}, "colorway": ["#636efa", "#EF553B", "#00cc96", "#ab63fa", "#FFA15A", "#19d3f3", "#FF6692", "#B6E880", "#FF97FF", "#FECB52"], "font": {"color": "#f2f5fa"}, "geo": {"bgcolor": "rgb(17,17,17)", "lakecolor": "rgb(17,17,17)", "landcolor": "rgb(17,17,17)", "showlakes": true, "showland": true, "subunitcolor": "#506784"}, "hoverlabel": {"align": "left"}, "hovermode": "closest", "mapbox": {"style": "dark"}, "paper_bgcolor": "rgb(17,17,17)", "plot_bgcolor": "rgb(17,17,17)", "polar": {"angularaxis": {"gridcolor": "#506784", "linecolor": "#506784", "ticks": ""}, "bgcolor": "rgb(17,17,17)", "radialaxis": {"gridcolor": "#506784", "linecolor": "#506784", "ticks": ""}}, "scene": {"xaxis": {"backgroundcolor": "rgb(17,17,17)", "gridcolor": "#506784", "gridwidth": 2, "linecolor": "#506784", "showbackground": true, "ticks": "", "zerolinecolor": "#C8D4E3"}, "yaxis": {"backgroundcolor": "rgb(17,17,17)", "gridcolor": "#506784", "gridwidth": 2, "linecolor": "#506784", "showbackground": true, "ticks": "", "zerolinecolor": "#C8D4E3"}, "zaxis": {"backgroundcolor": "rgb(17,17,17)", "gridcolor": "#506784", "gridwidth": 2, "linecolor": "#506784", "showbackground": true, "ticks": "", "zerolinecolor": "#C8D4E3"}}, "shapedefaults": {"line": {"color": "#f2f5fa"}}, "sliderdefaults": {"bgcolor": "#C8D4E3", "bordercolor": "rgb(17,17,17)", "borderwidth": 1, "tickwidth": 0}, "ternary": {"aaxis": {"gridcolor": "#506784", "linecolor": "#506784", "ticks": ""}, "baxis": {"gridcolor": "#506784", "linecolor": "#506784", "ticks": ""}, "bgcolor": "rgb(17,17,17)", "caxis": {"gridcolor": "#506784", "linecolor": "#506784", "ticks": ""}}, "title": {"x": 0.05}, "updatemenudefaults": {"bgcolor": "#506784", "borderwidth": 0}, "xaxis": {"automargin": true, "gridcolor": "#283442", "linecolor": "#506784", "ticks": "", "title": {"standoff": 15}, "zerolinecolor": "#283442", "zerolinewidth": 2}, "yaxis": {"automargin": true, "gridcolor": "#283442", "linecolor": "#506784", "ticks": "", "title": {"standoff": 15}, "zerolinecolor": "#283442", "zerolinewidth": 2}}}, "xaxis": {"anchor": "y", "domain": [0.0, 1.0], "title": {"text": "Body Weight (kg)"}, "fixedrange": true, "tickvals": [52, 57, 63, 70, 77, 84, 91]}, "yaxis": {"anchor": "x", "domain": [0.0, 1.0], "title": {"text": "Total"}, "fixedrange": true}, "legend": {"title": {"text": "Weight Class"}, "tracegroupgap": 0, "itemsizing": "constant"}, "title": {"text": "Women", "x": 0.5}, "margin": {"l": 0, "r": 0, "t": 30, "b": 0}, "paper_bgcolor": "#0F0F0F", "plot_bgcolor": "#0F0F0F", "showlegend": false}};
+            const config = {
+                responsive: true,
+                displaylogo: false,
+                displayModeBar: false
+            };
+
+            // Render men plot with fade-in effect
+            const menPlotContainer = document.getElementById('men-plot-container');
+            const menSkeleton = menPlotContainer.querySelector('.skeleton-loader');
+
+            if (Object.keys(menData).length > 0) {
+                Plotly.newPlot('men-plot', menData.data, menData.layout, config).then(() => {
+                    menSkeleton.style.opacity = '0';
+                    setTimeout(() => menSkeleton.style.display = 'none', 300);
+                });
+            } else {
+                document.getElementById('men-plot').innerHTML =
+                    '<div class="flex h-full items-center justify-center"><p>No data available</p></div>';
+                menSkeleton.style.display = 'none';
+            }
+
+            // Render women plot with fade-in effect
+            const womenPlotContainer = document.getElementById('women-plot-container');
+            const womenSkeleton = womenPlotContainer.querySelector('.skeleton-loader');
+
+            if (Object.keys(womenData).length > 0) {
+                Plotly.newPlot('women-plot', womenData.data, womenData.layout, config).then(() => {
+                    womenSkeleton.style.opacity = '0';
+                    setTimeout(() => womenSkeleton.style.display = 'none', 300);
+                });
+            } else {
+                document.getElementById('women-plot').innerHTML =
+                    '<div class="flex h-full items-center justify-center"><p>No data available</p></div>';
+                womenSkeleton.style.display = 'none';
+            }
         }
 
-        const genderValue = gender.value;
+        // Calculator Initialization
+        function initializeCalculator() {
+            let menPlotOriginal = null;
+            let womenPlotOriginal = null;
+            let menPlotReady = false;
+            let womenPlotReady = false;
 
-        // You can replace this formula with your actual RIS score calculation
-        const risScore = risIndex(bodyWeight, ...(genderValue === "men" ? men_const : women_const)) * totalWeight;
+            const calculateBtn = document.getElementById('calculate-btn');
+            const showOnCurveBtn = document.getElementById('show-on-curve-btn');
+            const clearCurveBtn = document.getElementById('clear-curve-btn');
+            const rankButtons = document.getElementById('rank-buttons');
+            const risResult = document.getElementById('ris-result');
 
-        document.getElementById('risScoreResult').innerText = `${risScore.toFixed(2)}`;
-    }
-</script>
+            // Capture original plot data
+            function capturePlotData() {
+                try {
+                    if (!menPlotReady && document.getElementById('men-plot')) {
+                        const menPlot = document.getElementById('men-plot');
+                        if (menPlot.data && menPlot.data.length > 0) {
+                            menPlotOriginal = {
+                                data: JSON.parse(JSON.stringify(menPlot.data)),
+                                layout: JSON.parse(JSON.stringify(menPlot.layout))
+                            };
+                            menPlotReady = true;
+                        }
+                    }
 
+                    if (!womenPlotReady && document.getElementById('women-plot')) {
+                        const womenPlot = document.getElementById('women-plot');
+                        if (womenPlot.data && womenPlot.data.length > 0) {
+                            womenPlotOriginal = {
+                                data: JSON.parse(JSON.stringify(womenPlot.data)),
+                                layout: JSON.parse(JSON.stringify(womenPlot.layout))
+                            };
+                            womenPlotReady = true;
+                        }
+                    }
+
+                    if (!menPlotReady || !womenPlotReady) {
+                        setTimeout(capturePlotData, 500);
+                    }
+                } catch (e) {
+                    console.error('Error capturing plot data:', e);
+                    setTimeout(capturePlotData, 1000);
+                }
+            }
+
+            // Start capturing plot data
+            setTimeout(capturePlotData, 1000);
+
+            // Calculate button functionality with loading state
+            if (calculateBtn) {
+                calculateBtn.addEventListener('click', function() {
+                    // Add loading state
+                    this.innerHTML = '<span class="loading-spinner"></span>Calculating...';
+                    this.disabled = true;
+
+                    const bodyweight = parseFloat(document.getElementById('bodyweight-input').value) || 0;
+                    const total = parseFloat(document.getElementById('total-input').value) || 0;
+                    const gender = document.querySelector('input[name="gender"]:checked').value;
+
+                    // Simulate calculation delay for smooth UX
+                    setTimeout(() => {
+                        if (bodyweight <= 0 || total <= 0) {
+                            risResult.textContent = '0.00';
+                            rankButtons.classList.add('hidden');
+                            clearCurveBtn.classList.add('hidden');
+                        } else {
+                            let risScore;
+                            if (gender === 'male') {
+                                risScore = risIndex(bodyweight, men_const[0], men_const[1], men_const[2], men_const[3], men_const[4]) * total;
+                            } else {
+                                risScore = risIndex(bodyweight, women_const[0], women_const[1], women_const[2], women_const[3], women_const[4]) * total;
+                            }
+
+                            animateValue(risResult, 0.0, risScore.toFixed(2), 500);
+                            rankButtons.classList.remove('hidden');
+                            rankButtons.classList.remove('opacity-0');
+                        }
+
+                        // Reset button state
+                        this.innerHTML = 'Calculate';
+                        this.disabled = false;
+                    }, 500);
+                });
+            }
+
+            // Show on curve button functionality
+            if (showOnCurveBtn) {
+                showOnCurveBtn.addEventListener('click', function() {
+                    const bodyweight = parseFloat(document.getElementById('bodyweight-input').value) || 0;
+                    const total = parseFloat(document.getElementById('total-input').value) || 0;
+                    const gender = document.querySelector('input[name="gender"]:checked').value;
+                    const plotId = gender === 'male' ? 'men-plot' : 'women-plot';
+
+                    if ((plotId === 'men-plot' && !menPlotReady) || (plotId === 'women-plot' && !womenPlotReady)) {
+                        showToast("Please wait, plot data is still loading.");
+                        return;
+                    }
+
+                    clearCurveBtn.classList.remove('hidden');
+                    addUserPoint(plotId, bodyweight, total);
+                    document.getElementById(plotId).scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                });
+            }
+
+            // Clear curve button functionality
+            if (clearCurveBtn) {
+                clearCurveBtn.addEventListener('click', function() {
+                    resetPlots();
+                    this.classList.add('hidden');
+                });
+            }
+
+            // Reset plots to original state
+            function resetPlots() {
+                if (menPlotReady && document.getElementById('men-plot') && menPlotOriginal) {
+                    Plotly.react('men-plot', menPlotOriginal.data, menPlotOriginal.layout);
+                    // Explicitly clear annotations
+                    Plotly.relayout('men-plot', { annotations: [] });
+                }
+                if (womenPlotReady && document.getElementById('women-plot') && womenPlotOriginal) {
+                    Plotly.react('women-plot', womenPlotOriginal.data, womenPlotOriginal.layout);
+                    // Explicitly clear annotations
+                    Plotly.relayout('women-plot', { annotations: [] });
+                }
+            }
+
+            // Add user's point to plot with enhanced visuals
+            function addUserPoint(plotId, bodyweight, total) {
+                const plot = document.getElementById(plotId);
+                if (!plot || !plot.data) return;
+
+                const gender = plotId === 'men-plot' ? 'male' : 'female';
+                const constants = gender === 'male' ? men_const : women_const;
+                const expectedTotal = 100 / risIndex(bodyweight, constants[0], constants[1], constants[2], constants[3], constants[4]);
+                const existingData = JSON.parse(JSON.stringify(plot.data));
+
+                // Create user point trace with animation
+                const userPoint = {
+                    x: [bodyweight],
+                    y: [total],
+                    mode: 'markers',
+                    type: 'scatter',
+                    marker: {
+                        size: 16,
+                        color: 'rgba(255, 0, 0, 0.8)',
+                        symbol: 'diamond',
+                        line: { color: 'white', width: 2 }
+                    },
+                    name: 'Your Performance',
+                    hoverinfo: 'text',
+                    hovertext: `Your Performance:<br>Bodyweight: ${bodyweight}kg<br>Total: ${total}kg`,
+                    showlegend: false
+                };
+
+                // Create expected point trace
+                const expectedPoint = {
+                    x: [bodyweight],
+                    y: [expectedTotal],
+                    mode: 'markers',
+                    type: 'scatter',
+                    marker: {
+                        size: 12,
+                        color: 'rgba(255, 215, 0, 0.8)',
+                        symbol: 'circle',
+                        line: { color: 'white', width: 1 }
+                    },
+                    name: 'Expected at 100 RIS',
+                    hoverinfo: 'text',
+                    hovertext: `Expected at 100 RIS:<br>Bodyweight: ${bodyweight}kg<br>Total: ${expectedTotal.toFixed(1)}kg`,
+                    showlegend: false
+                };
+
+                // Create connection line trace
+                const connectionLine = {
+                    x: [bodyweight, bodyweight],
+                    y: [total, expectedTotal],
+                    mode: 'lines',
+                    type: 'scatter',
+                    line: {
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        width: 2,
+                        dash: 'dot'
+                    },
+                    name: 'Connection Line',
+                    showlegend: false,
+                    hoverinfo: 'text',
+                    hovertext: `Performance Gap: ${Math.abs(total - expectedTotal).toFixed(1)}kg`,
+                };
+
+                existingData.push(userPoint);
+                existingData.push(expectedPoint);
+                existingData.push(connectionLine);
+                Plotly.react(plotId, existingData, plot.layout);
+
+                // Create annotation for the point
+                const position = total > expectedTotal ? 'above' : 'below';
+                const emoji = total > expectedTotal ? '🔥' : '💪';
+                const message = total > expectedTotal ?
+                               `${emoji} You're ${((total/expectedTotal)*100-100).toFixed(1)}% above the elite curve!` :
+                               `${emoji} You're at ${((total/expectedTotal)*100).toFixed(1)}% of the elite curve`;
+
+                const annotation = {
+                    x: bodyweight,
+                    y: total,
+                    xref: 'x',
+                    yref: 'y',
+                    text: message,
+                    showarrow: true,
+                    arrowhead: 2,
+                    arrowsize: 1,
+                    arrowcolor: 'red',
+                    ax: 0,
+                    ay: -40,
+                    font: {
+                        size: 12,
+                        color: 'white',
+                        family: 'Inter, sans-serif',
+                    },
+                    bgcolor: 'rgba(0, 0, 0, 0.7)',
+                    bordercolor: 'red',
+                    borderwidth: 1,
+                    borderpad: 4,
+                };
+
+                Plotly.relayout(plotId, { annotations: [annotation] });
+            }
+
+            const ratingIndicator = document.getElementById('rating-indicator');
+
+            if (calculateBtn) {
+                // Store original click handler
+                const originalClickHandler = calculateBtn.onclick;
+
+                // Replace with new handler that also updates rating bar
+                calculateBtn.onclick = function(event) {
+                    // Call original handler if it exists
+                    if (typeof originalClickHandler === 'function') {
+                        originalClickHandler.call(this, event);
+                    }
+
+                    // Update rating indicator based on score
+                    setTimeout(() => {
+                        const score = parseFloat(document.getElementById('ris-result').textContent);
+                        if (!isNaN(score) && score > 0) {
+                            // Calculate width percentage based on score (capping at 100)
+                            let percentage = Math.min(100, (score / 100) * 100);
+                            ratingIndicator.style.width = `${percentage}%`;
+
+                            // Set gradient based on score ranges
+                            if (score < 70) {
+                                ratingIndicator.className = 'h-full bg-gradient-to-r from-red-600 to-yellow-600 transition-all duration-500 opacity-80';
+                            } else if (score < 80) {
+                                ratingIndicator.className = 'h-full bg-gradient-to-r from-yellow-600 to-green-600 transition-all duration-500 opacity-80';
+                            } else if (score < 90) {
+                                ratingIndicator.className = 'h-full bg-gradient-to-r from-green-600 to-blue-600 transition-all duration-500 opacity-80';
+                            } else {
+                                ratingIndicator.className = 'h-full bg-gradient-to-r from-blue-600 to-purple-600 transition-all duration-500 opacity-80';
+                            }
+
+                        } else {
+                            ratingIndicator.style.width = '0%';
+                        }
+                    }, 1200); // Delay to match animation
+                };
+            }
+        }
+
+        // Constants and Formulas Initialization with animation
+        function initializeConstantsAndFormulas() {
+            if (typeof men_const !== 'undefined' && typeof women_const !== 'undefined') {
+                const table = document.getElementById('constants-table');
+                const tbody = table.querySelector('tbody');
+                const labels = ['A', 'K', 'B', 'v', 'Q'];
+
+                // Create table rows with fade-in animation
+                for (let i = 0; i < 5; i++) {
+                    const row = document.createElement('tr');
+                    row.className = 'border-t border-dark-300 opacity-0 transition-opacity duration-300';
+                    row.style.animationDelay = `${i * 100}ms`;
+
+                    const nameCell = document.createElement('td');
+                    nameCell.className = 'py-2 text-gray-300';
+                    nameCell.textContent = labels[i];
+                    row.appendChild(nameCell);
+
+                    const menCell = document.createElement('td');
+                    menCell.className = 'py-2 text-gray-300';
+                    menCell.textContent = men_const[i];
+                    row.appendChild(menCell);
+
+                    const womenCell = document.createElement('td');
+                    womenCell.className = 'py-2 text-gray-300';
+                    womenCell.textContent = women_const[i];
+                    row.appendChild(womenCell);
+
+                    tbody.appendChild(row);
+
+                    // Fade in the row
+                    setTimeout(() => {
+                        row.classList.remove('opacity-0');
+                    }, i * 100);
+                }
+
+                // Generate Excel formulas
+                const excelMenFormula = `=B2*100/(${men_const[0]}+(${men_const[1]}-${men_const[0]})/(1+${men_const[4]}*EXP(-${men_const[2]}*(A2-${men_const[3]}))))`;
+                document.getElementById('excel-men-formula').textContent = excelMenFormula;
+
+                const excelWomenFormula = `=B2*100/(${women_const[0]}+(${women_const[1]}-${women_const[0]})/(1+${women_const[4]}*EXP(-${women_const[2]}*(A2-${women_const[3]}))))`;
+                document.getElementById('excel-women-formula').textContent = excelWomenFormula;
+
+                // Generate Google Sheets code
+                const googleSheetsCode = `function RIS_MEN(bodyweight, total) {
+  var A = ${men_const[0]};
+  var K = ${men_const[1]};
+  var B = ${men_const[2]};
+  var v = ${men_const[3]};
+  var Q = ${men_const[4]};
+
+  return total * 100 / (A + (K - A) / (1 + Q * Math.exp(-B * (bodyweight - v))));
+}
+
+function RIS_WOMEN(bodyweight, total) {
+  var A = ${women_const[0]};
+  var K = ${women_const[1]};
+  var B = ${women_const[2]};
+  var v = ${women_const[3]};
+  var Q = ${women_const[4]};
+
+  return total * 100 / (A + (K - A) / (1 + Q * Math.exp(-B * (bodyweight - v))));
+}`;
+                document.getElementById('google-sheets-code').textContent = googleSheetsCode;
+
+                // Initialize syntax highlighting
+                hljs.highlightAll();
+
+                // Setup copy buttons with improved feedback
+                const copyButtons = document.querySelectorAll('.copy-button');
+                copyButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const targetId = this.getAttribute('data-target');
+                        const codeElement = document.getElementById(targetId);
+                        const textToCopy = codeElement.textContent;
+
+                        navigator.clipboard.writeText(textToCopy).then(() => {
+                            const originalText = this.textContent;
+                            this.textContent = 'Copied!';
+                            this.style.background = '#10B981';
+                            this.style.transform = 'scale(0.95)';
+
+                            setTimeout(() => {
+                                this.textContent = originalText;
+                                this.style.background = '';
+                                this.style.transform = '';
+                            }, 2000);
+                        });
+                    });
+                });
+            }
+        }
+
+        // FAQ Toggle Initialization with smooth animations
+        function initializeFAQToggles() {
+            const faqToggles = document.querySelectorAll('.faq-toggle');
+            faqToggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const content = this.nextElementSibling;
+                    const icon = this.querySelector('.faq-icon');
+
+                    if (content.classList.contains('hidden')) {
+                        content.classList.remove('hidden');
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        content.style.opacity = '0';
+
+                        requestAnimationFrame(() => {
+                            content.style.transition = 'max-height 0.3s ease, opacity 0.3s ease';
+                            content.style.opacity = '1';
+                        });
+
+                        icon.classList.add('rotate-180');
+                    } else {
+                        content.style.opacity = '0';
+                        content.style.maxHeight = '0px';
+
+                        setTimeout(() => {
+                            content.classList.add('hidden');
+                            content.style.maxHeight = '';
+                            content.style.opacity = '';
+                        }, 300);
+
+                        icon.classList.remove('rotate-180');
+                    }
+                });
+            });
+        }
+
+        // Value animation with easing
+        function animateValue(element, start, end, duration) {
+            const range = end - start;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeOutQuad = 1 - Math.pow(1 - progress, 3);
+                const currentValue = start + (range * easeOutQuad);
+
+                element.textContent = currentValue.toFixed(2);
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        // Toast notification function
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-4 right-4 bg-dark-300 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-full transition-transform duration-300';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            requestAnimationFrame(() => {
+                toast.style.transform = 'translateY(0)';
+            });
+
+            setTimeout(() => {
+                toast.style.transform = 'translateY(120%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Input validation and feedback
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('calculate-btn').click();
+                }
+            });
+
+            input.addEventListener('input', function() {
+                if (this.value < 0) {
+                    this.value = 0;
+                }
+            });
+        });
+    </script>
 </body>
 </html>
