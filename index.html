@@ -24,6 +24,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/excel.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
     <!-- Tailwind Configuration -->
     <script>
@@ -342,26 +343,38 @@
                     </div>
 
                     <!-- See Rank button - hidden by default -->
-                    <div id="rank-buttons" class="mt-6 hidden opacity-0 transition-opacity duration-300 w-full">
-                        <div class="flex flex-col sm:flex-row gap-3">
-                            <button id="show-on-curve-btn" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg text-center font-medium transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-md">
-                                <span class="flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                    </svg>
-                                    Show on Performance Curve
-                                </span>
-                            </button>
-                            <button id="clear-curve-btn" class="flex-1 bg-dark-300 hover:bg-dark-400 text-white py-3 px-4 rounded-lg text-center font-medium transition-all hidden transform hover:scale-[1.02] active:scale-[0.98] shadow-md">
-                                <span class="flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                    Clear
-                                </span>
-                            </button>
-                        </div>
-                    </div>
+                    <!-- Improved button layout with share button on far right -->
+<div id="rank-buttons" class="mt-6 hidden opacity-0 transition-opacity duration-300 w-full">
+    <div class="flex flex-col sm:flex-row gap-3 items-stretch">
+        <!-- Performance Curve Button -->
+        <button id="show-on-curve-btn" class="flex-1 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white py-3 px-4 rounded-lg text-center font-medium transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-md backdrop-blur-sm">
+            <span class="flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                <span>View on Curve</span>
+            </span>
+        </button>
+
+        <!-- Clear Button - Stays in the middle -->
+        <button id="clear-curve-btn" class="flex-1 bg-dark-300 hover:bg-dark-400 active:bg-dark-400 text-white py-3 px-4 rounded-lg text-center font-medium transition-all hidden transform hover:scale-[1.02] active:scale-[0.98] shadow-md backdrop-blur-sm">
+            <span class="flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                <span>Clear</span>
+            </span>
+        </button>
+
+        <!-- Share Button - Now positioned on the far right -->
+        <button id="share-score-btn" class="sm:ml-auto bg-red-600 hover:bg-red-700 active:bg-red-800 text-white p-3 rounded-lg flex items-center justify-center transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-md backdrop-blur-sm w-full sm:w-12 h-12 sm:h-auto">
+            <span class="sm:hidden mr-2">Share Score</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+            </svg>
+        </button>
+    </div>
+</div>
                 </div>
             </div>
         </div>
@@ -605,6 +618,7 @@
             initializeCalculator();
             initializeConstantsAndFormulas();
             initializeFAQToggles();
+            initializeSharing();
 
             // Remove loading overlay after a brief delay
             setTimeout(() => {
@@ -1056,6 +1070,180 @@ function RIS_WOMEN(bodyweight, total) {
                 });
             });
         }
+
+        function initializeSharing() {
+    const shareScoreBtn = document.getElementById('share-score-btn');
+
+    // Add tooltip to share button
+    if (shareScoreBtn) {
+        shareScoreBtn.setAttribute('title', 'Share Score');
+
+        // Handle share button click
+        shareScoreBtn.addEventListener('click', function() {
+            // Create loading spinner inside button
+            const originalContent = this.innerHTML;
+            this.innerHTML = `<div class="loading-spinner w-5 h-5 border-2"></div>`;
+
+            // Create a custom div for capture
+            const captureDiv = document.createElement('div');
+            captureDiv.style.position = 'absolute';
+            captureDiv.style.left = '-9999px';
+            captureDiv.style.backgroundColor = '#1A1A1A';
+            captureDiv.style.padding = '30px';
+            captureDiv.style.borderRadius = '8px';
+            captureDiv.style.border = '1px solid #3A3A3A';
+            captureDiv.style.width = '400px';
+            captureDiv.style.textAlign = 'center';
+
+            // Get current values
+            const score = parseFloat(document.getElementById('ris-result').textContent);
+            const bodyWeight = document.getElementById('bodyweight-input').value;
+            const total = document.getElementById('total-input').value;
+            const gender = document.querySelector('input[name="gender"]:checked').value;
+            const genderText = gender === 'male' ? 'Men' : 'Women';
+
+            // Determine ranking based on score
+            let ranking, rankingColor, rankingEmoji;
+            if (score < 70) {
+                ranking = "Beginner";
+                rankingColor = "#EF4444"; // red
+                rankingEmoji = "🐣";
+            } else if (score < 80) {
+                ranking = "Intermediate";
+                rankingColor = "#F59E0B"; // amber
+                rankingEmoji = "📈";
+            } else if (score < 95) {
+                ranking = "Advanced";
+                rankingColor = "#10B981"; // green
+                rankingEmoji = "🚀";
+            } else {
+                ranking = "World-class";
+                rankingColor = "#6366F1"; // indigo
+                rankingEmoji = "🏆";
+            }
+
+            // Create ranking bar
+            let ratingBar = '';
+            ratingBar += `<div style="width: 100%; height: 8px; background-color: #2A2A2A; border-radius: 9999px; margin: 10px 0; position: relative; overflow: hidden;">`;
+
+            // Level markers
+            ratingBar += `<div style="position: absolute; top: 0; bottom: 0; left: 30%; width: 1px; background-color: rgba(255,255,255,0.3);"></div>`;
+            ratingBar += `<div style="position: absolute; top: 0; bottom: 0; left: 45%; width: 1px; background-color: rgba(255,255,255,0.3);"></div>`;
+            ratingBar += `<div style="position: absolute; top: 0; bottom: 0; left: 70%; width: 1px; background-color: rgba(255,255,255,0.3);"></div>`;
+            ratingBar += `<div style="position: absolute; top: 0; bottom: 0; left: 80%; width: 1px; background-color: rgba(255,255,255,0.3);"></div>`;
+            ratingBar += `<div style="position: absolute; top: 0; bottom: 0; left: 95%; width: 1px; background-color: rgba(255,255,255,0.3);"></div>`;
+
+            // Rating indicator - width based on score
+            let percentage = Math.min(100, (score / 100) * 100);
+            let gradientColor;
+            if (score < 70) {
+                gradientColor = "linear-gradient(to right, #EF4444, #F59E0B)";
+            } else if (score < 80) {
+                gradientColor = "linear-gradient(to right, #F59E0B, #10B981)";
+            } else if (score < 95) {
+                gradientColor = "linear-gradient(to right, #10B981, #6366F1)";
+            } else {
+                gradientColor = "linear-gradient(to right, #6366F1, #8B5CF6)";
+            }
+
+            ratingBar += `<div style="height: 100%; width: ${percentage}%; background: ${gradientColor}; opacity: 0.8;"></div>`;
+            ratingBar += `</div>`;
+
+            // Create content for the capture div
+            captureDiv.innerHTML = `
+                <div style="margin-bottom: 5px; color: #a0aec0; font-size: 16px;">RIS Score</div>
+                <div style="font-size: 72px; font-weight: bold; color: white; margin-bottom: 5px;">${score.toFixed(2)}</div>
+                <div style="font-size: 18px; font-weight: bold; color: ${rankingColor}; margin-bottom: 10px;">${ranking} ${rankingEmoji}</div>
+                ${ratingBar}
+                <div style="color: #a0aec0; font-size: 14px; margin-top: 15px; margin-bottom: 5px;">Body Weight: ${bodyWeight}kg | Total: ${total}kg</div>
+                <div style="color: #a0aec0; font-size: 14px; margin-bottom: 20px;">Category: ${genderText}</div>
+                <div style="border-top: 1px solid #3A3A3A; padding-top: 15px; margin-top: 10px;">
+                    <div style="font-size: 12px; color: #999;">Calculate your RIS score at</div>
+                    <div style="font-weight: 600; color: white; font-size: 14px;">warisradji.com/ris</div>
+                </div>
+            `;
+
+            // Add the div to the document
+            document.body.appendChild(captureDiv);
+
+            // Use html2canvas to capture the div
+            html2canvas(captureDiv, {
+                backgroundColor: '#1A1A1A',
+                scale: 2,
+                logging: false
+            }).then(canvas => {
+                // Remove the div
+                document.body.removeChild(captureDiv);
+
+                // Create share text
+                const shareText = `My RIS Score: ${score.toFixed(2)} - ${ranking} | Calculate your Relative Index for Streetlifting score at warisradji.com/ris`;
+
+                // Convert canvas to Blob
+                canvas.toBlob(async function(blob) {
+                    // First, always download the image
+                    const imageUrl = URL.createObjectURL(blob);
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = imageUrl;
+                    downloadLink.download = 'RIS-Score.png';
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+
+                    // Show download toast
+                    showToast('Image downloaded successfully!');
+
+                    // Clean up the blob URL
+                    URL.revokeObjectURL(imageUrl);
+
+                    // Then, check if we can also share it natively
+                    if (navigator.share && navigator.canShare) {
+                        try {
+                            // Create file from blob
+                            const file = new File([blob], 'RIS-Score.png', { type: 'image/png' });
+
+                            // Check if we can share files
+                            const shareData = {
+                                title: 'My RIS Score',
+                                text: shareText,
+                                url: 'https://warisradji.com/ris',
+                                files: [file]
+                            };
+
+                            // Remove files if not supported
+                            if (!navigator.canShare(shareData)) {
+                                delete shareData.files;
+                            }
+
+                            // Short delay to allow the download to complete
+                            setTimeout(async () => {
+                                try {
+                                    // Trigger native share dialog
+                                    await navigator.share(shareData);
+                                    showToast('Share dialog opened!');
+                                } catch (error) {
+                                    console.log('Share cancelled or failed', error);
+                                    // No need to show error for cancelled share
+                                }
+                            }, 500);
+                        } catch (error) {
+                            console.error('Error sharing:', error);
+                            // No need to notify user if sharing fails after download
+                        }
+                    }
+
+                    // Restore button content
+                    this.innerHTML = originalContent;
+
+                }.bind(this), 'image/png', 0.9);
+
+            }).catch(error => {
+                console.error('Error generating image:', error);
+                this.innerHTML = originalContent;
+                showToast('Error generating image. Please try again.');
+            });
+        });
+    }
+}
 
         // Value animation with easing
         function animateValue(element, start, end, duration) {
